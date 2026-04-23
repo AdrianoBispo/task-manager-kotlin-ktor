@@ -5,249 +5,249 @@ description: "Task list for Backend Kotlin/Ktor para Gerenciador de Tarefas"
 
 # Tasks: Backend Kotlin/Ktor para Gerenciador de Tarefas
 
-**Input**: Design documents from `/specs/001-task-manager-backend-plan/`
-**Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
+**Entrada**: Documentos de design em `/specs/001-task-manager-backend-plan/`
+**Pré-requisitos**: plan.md (obrigatório), spec.md (obrigatório para histórias de usuário), research.md, data-model.md, contracts/
 
-**Tests**: Included because the feature spec explicitly requires unit, integration, and contract test coverage.
+**Testes**: Incluídos porque a especificação da funcionalidade exige explicitamente cobertura de testes unitários, de integração e de contrato.
 
-**Organization**: Tasks are grouped by user story to support independent implementation and validation.
+**Organização**: As tarefas são agrupadas por história de usuário para suportar implementação e validação independentes.
 
-## Format: `[ID] [P?] [Story] Description with file path`
+## Formato: `[ID] [P?] [Story] Descrição com caminho do arquivo`
 
-- **[P]**: Can run in parallel with other marked tasks
-- **[Story]**: User story label, e.g. `[US1]`, `[US2]`
-- Paths below are exact repository paths
+- **[P]**: Pode ser executada em paralelo com outras tarefas marcadas
+- **[Story]**: Rótulo da história de usuário, ex.: `[US1]`, `[US2]`
+- Os caminhos abaixo são caminhos exatos do repositório
 
-## Phase 1: Setup (Shared Infrastructure)
+## Fase 1: Setup (Infraestrutura Compartilhada)
 
-**Purpose**: Project initialization and alignment with the backend scope
+**Objetivo**: Inicialização do projeto e alinhamento com o escopo do backend
 
-- [ ] T001 Update Gradle dependencies and test libraries in `build.gradle.kts` for Ktor JWT, StatusPages, CORS, ContentNegotiation, Exposed, Flyway, Koin, bcrypt, MockK, and Testcontainers
-- [ ] T002 Configure runtime properties and placeholders in `src/main/resources/application.conf` for `postgres.url`, `postgres.user`, `postgres.password`, `jwt.secret`, `jwt.issuer`, `jwt.audience`, and CORS settings
-- [ ] T003 [P] Create the backend package structure and application bootstrap files in `src/main/kotlin/main.kt`, `src/main/kotlin/Routing.kt`, `src/main/kotlin/Security.kt`, `src/main/kotlin/StatusPages.kt`, `src/main/kotlin/Serialization.kt`, `src/main/kotlin/Koin.kt`, `src/main/kotlin/auth/`, `src/main/kotlin/tasks/`, `src/main/kotlin/users/`, and `src/main/kotlin/shared/`
-
----
-
-## Phase 2: Foundational (Blocking Prerequisites)
-
-**Purpose**: Core platform pieces required before any user story can be implemented
-
-**⚠️ CRITICAL**: No user story work should begin until this phase is complete
-
-- [ ] T004 Create the initial Flyway migration for users and tasks in `src/main/resources/db/migration/V1__create_task_manager_schema.sql`
-- [ ] T005 [P] Implement database wiring and Exposed table definitions for users and tasks in `src/main/kotlin/shared/DatabaseFactory.kt` and `src/main/kotlin/shared/Tables.kt`
-- [ ] T006 [P] Implement shared JSON serialization and snake_case DTO support in `src/main/kotlin/Serialization.kt` and `src/main/kotlin/shared/JsonConfig.kt`
-- [ ] T007 [P] Implement centralized API error envelope models and StatusPages mappings in `src/main/kotlin/StatusPages.kt` and `src/main/kotlin/shared/ApiError.kt`
-- [ ] T008 [P] Implement JWT configuration and authenticated principal helpers in `src/main/kotlin/Security.kt` and `src/main/kotlin/shared/AuthPrincipal.kt`
-- [ ] T009 [P] Implement Koin module composition, CORS, and application route registration in `src/main/kotlin/Koin.kt` and `src/main/kotlin/Routing.kt`
-
-**Checkpoint**: Foundation ready — user story implementation can now begin
+- [ ] T001 Atualizar dependências do Gradle e bibliotecas de teste em `build.gradle.kts` para Ktor JWT, StatusPages, CORS, ContentNegotiation, Exposed, Flyway, Koin, bcrypt, MockK e Testcontainers
+- [ ] T002 Configurar propriedades de runtime e placeholders em `src/main/resources/application.conf` para `postgres.url`, `postgres.user`, `postgres.password`, `jwt.secret`, `jwt.issuer`, `jwt.audience` e configurações de CORS
+- [ ] T003 [P] Criar a estrutura de pacotes do backend e os arquivos de bootstrap da aplicação em `src/main/kotlin/main.kt`, `src/main/kotlin/Routing.kt`, `src/main/kotlin/Security.kt`, `src/main/kotlin/StatusPages.kt`, `src/main/kotlin/Serialization.kt`, `src/main/kotlin/Koin.kt`, `src/main/kotlin/auth/`, `src/main/kotlin/tasks/`, `src/main/kotlin/users/` e `src/main/kotlin/shared/`
 
 ---
 
-## Phase 3: User Story 1 - Authentication register/login (Priority: P1)
+## Fase 2: Fundacional (Pré-requisitos Bloqueantes)
 
-**Goal**: Allow a user to register, log in, and receive a JWT plus the authenticated user payload
+**Objetivo**: Componentes centrais da plataforma exigidos antes de qualquer história de usuário ser implementada
 
-**Independent Test**: `POST /api/auth/register` returns `201` with `usuario` and `token`; `POST /api/auth/login` returns `200`; invalid credentials and duplicate email return the contract error envelope
+**⚠️ CRÍTICO**: Nenhum trabalho de história de usuário deve começar até que esta fase esteja concluída
 
-### Tests for User Story 1
+- [ ] T004 Criar a migração inicial do Flyway para usuários e tarefas em `src/main/resources/db/migration/V1__create_task_manager_schema.sql`
+- [ ] T005 [P] Implementar configuração de banco de dados e definições de tabelas Exposed para usuários e tarefas em `src/main/kotlin/shared/DatabaseFactory.kt` e `src/main/kotlin/shared/Tables.kt`
+- [ ] T006 [P] Implementar serialização JSON compartilhada e suporte a DTOs em snake_case em `src/main/kotlin/Serialization.kt` e `src/main/kotlin/shared/JsonConfig.kt`
+- [ ] T007 [P] Implementar modelos centralizados de envelope de erro da API e mapeamentos de StatusPages em `src/main/kotlin/StatusPages.kt` e `src/main/kotlin/shared/ApiError.kt`
+- [ ] T008 [P] Implementar configuração de JWT e helpers de principal autenticado em `src/main/kotlin/Security.kt` e `src/main/kotlin/shared/AuthPrincipal.kt`
+- [ ] T009 [P] Implementar composição de módulos Koin, CORS e registro de rotas da aplicação em `src/main/kotlin/Koin.kt` e `src/main/kotlin/Routing.kt`
 
-- [ ] T010 [P] [US1] Define auth contract tests for register and login in `src/test/kotlin/contract/AuthContractTest.kt`
-- [ ] T011 [P] [US1] Add unit tests for registration validation, duplicate email handling, and invalid login in `src/test/kotlin/unit/AuthServiceTest.kt`
-
-### Implementation for User Story 1
-
-- [ ] T012 [P] [US1] Define auth request/response DTOs and user view models in `src/main/kotlin/auth/AuthDtos.kt`
-- [ ] T013 [P] [US1] Implement the user repository with unique email lookup and insert operations in `src/main/kotlin/users/UserRepository.kt`
-- [ ] T014 [US1] Implement the auth service with bcrypt hashing, login verification, JWT issuance, and last-login updates in `src/main/kotlin/auth/AuthService.kt`
-- [ ] T015 [US1] Implement `POST /api/auth/register` and `POST /api/auth/login` routes in `src/main/kotlin/auth/AuthRoutes.kt`
-- [ ] T016 [US1] Wire auth routes into the application module in `src/main/kotlin/Routing.kt` and `src/main/kotlin/main.kt`
-
-**Checkpoint**: Authentication should work end-to-end and be independently demonstrable
+**Checkpoint**: Fundação pronta — a implementação das histórias de usuário pode começar
 
 ---
 
-## Phase 4: User Story 2 - Criar tarefa e ver a tarefa criada na própria lista (Priority: P2)
+## Fase 3: História de Usuário 1 - Autenticação cadastro/login (Prioridade: P1)
 
-**Goal**: Let an authenticated user create a task with default values and retrieve their own tasks
+**Objetivo**: Permitir que um usuário se cadastre, faça login e receba um JWT mais os dados do usuário autenticado
 
-**Independent Test**: `POST /api/tasks` returns `201`, applies default `status=PENDENTE` and `prioridade=MEDIA` when omitted, and the created task is visible only to the owning user through `GET /api/tasks`
+**Teste Independente**: `POST /api/auth/register` retorna `201` com `usuario` e `token`; `POST /api/auth/login` retorna `200`; credenciais inválidas e e-mail duplicado retornam o envelope de erro de contrato
 
-### Tests for User Story 2
+### Testes da História de Usuário 1
 
-- [ ] T017 [P] [US2] Define contract tests for task creation and baseline authenticated listing in `src/test/kotlin/contract/TaskCreateListContractTest.kt`
-- [ ] T018 [P] [US2] Add an integration test proving a created task is visible only to the owning user in `src/test/kotlin/integration/TaskVisibilityTest.kt`
+- [ ] T010 [P] [US1] Definir testes de contrato de autenticação para cadastro e login em `src/test/kotlin/contract/AuthContractTest.kt`
+- [ ] T011 [P] [US1] Adicionar testes unitários para validação de cadastro, tratamento de e-mail duplicado e login inválido em `src/test/kotlin/unit/AuthServiceTest.kt`
 
-### Implementation for User Story 2
+### Implementação da História de Usuário 1
 
-- [ ] T019 [P] [US2] Define task request/response DTOs and list metadata models in `src/main/kotlin/tasks/TaskDtos.kt`
-- [ ] T020 [P] [US2] Implement the task repository with create and owner-scoped list operations in `src/main/kotlin/tasks/TaskRepository.kt`
-- [ ] T021 [US2] Implement the task service for creation defaults, title validation, and owner assignment in `src/main/kotlin/tasks/TaskService.kt`
-- [ ] T022 [US2] Implement authenticated `POST /api/tasks` and baseline `GET /api/tasks` routes in `src/main/kotlin/tasks/TaskRoutes.kt`
+- [ ] T012 [P] [US1] Definir DTOs de request/response de autenticação e view models de usuário em `src/main/kotlin/auth/AuthDtos.kt`
+- [ ] T013 [P] [US1] Implementar o repositório de usuários com busca por e-mail único e operações de inserção em `src/main/kotlin/users/UserRepository.kt`
+- [ ] T014 [US1] Implementar o serviço de autenticação com hash bcrypt, verificação de login, emissão de JWT e atualização do último login em `src/main/kotlin/auth/AuthService.kt`
+- [ ] T015 [US1] Implementar as rotas `POST /api/auth/register` e `POST /api/auth/login` em `src/main/kotlin/auth/AuthRoutes.kt`
+- [ ] T016 [US1] Integrar as rotas de autenticação ao módulo da aplicação em `src/main/kotlin/Routing.kt` e `src/main/kotlin/main.kt`
 
-**Checkpoint**: Task creation and owner-only listing should work end-to-end
-
----
-
-## Phase 5: User Story 3 - Atualizar status da tarefa (Priority: P3)
-
-**Goal**: Allow the owner to update task status while preserving transition rules and timestamps
-
-**Independent Test**: `PATCH /api/tasks/{id}` accepts valid transitions, rejects invalid transitions, and updates `data_conclusao` when moving to or from `CONCLUIDA` according to the model rules
-
-### Tests for User Story 3
-
-- [ ] T023 [P] [US3] Define contract tests for allowed and disallowed status transitions in `src/test/kotlin/contract/TaskStatusUpdateContractTest.kt`
-- [ ] T024 [P] [US3] Add unit tests for allowed and disallowed task status transitions in `src/test/kotlin/unit/TaskStatusPolicyTest.kt`
-
-### Implementation for User Story 3
-
-- [ ] T025 [US3] Extend the task repository with find-by-id and status update operations scoped by `id_usuario` in `src/main/kotlin/tasks/TaskRepository.kt`
-- [ ] T026 [US3] Implement task status transition logic and `data_conclusao` maintenance in `src/main/kotlin/tasks/TaskService.kt`
-- [ ] T027 [US3] Implement `PATCH /api/tasks/{id}` route behavior with `403` and `404` mapping in `src/main/kotlin/tasks/TaskRoutes.kt`
-- [ ] T028 [US3] Add an integration test for owner-only status updates in `src/test/kotlin/integration/TaskStatusUpdateIntegrationTest.kt`
-
-**Checkpoint**: Status updates should be secure, validated, and persist correctly
+**Checkpoint**: A autenticação deve funcionar de ponta a ponta e ser demonstrável de forma independente
 
 ---
 
-## Phase 6: User Story 4 - Editar e excluir tarefa (Priority: P4)
+## Fase 4: História de Usuário 2 - Criar tarefa e ver a tarefa criada na própria lista (Prioridade: P2)
 
-**Goal**: Let the owner partially edit a task and delete it with the required HTTP semantics
+**Objetivo**: Permitir que um usuário autenticado crie uma tarefa com valores padrão e recupere suas próprias tarefas
 
-**Independent Test**: `PATCH /api/tasks/{id}` returns the updated task on success, and `DELETE /api/tasks/{id}` returns `204`; both operations reject cross-user access with the contract error envelope
+**Teste Independente**: `POST /api/tasks` retorna `201`, aplica `status=PENDENTE` e `prioridade=MEDIA` por padrão quando omitidos, e a tarefa criada fica visível apenas para o usuário dono via `GET /api/tasks`
 
-### Tests for User Story 4
+### Testes da História de Usuário 2
 
-- [ ] T029 [P] [US4] Define contract tests for partial edit and delete behavior in `src/test/kotlin/contract/TaskEditDeleteContractTest.kt`
-- [ ] T030 [P] [US4] Add unit tests for partial validation, not-found handling, and delete behavior in `src/test/kotlin/unit/TaskEditDeleteServiceTest.kt`
+- [ ] T017 [P] [US2] Definir testes de contrato para criação de tarefa e listagem autenticada básica em `src/test/kotlin/contract/TaskCreateListContractTest.kt`
+- [ ] T018 [P] [US2] Adicionar um teste de integração comprovando que uma tarefa criada é visível apenas para o usuário dono em `src/test/kotlin/integration/TaskVisibilityTest.kt`
 
-### Implementation for User Story 4
+### Implementação da História de Usuário 2
 
-- [ ] T031 [US4] Extend the task repository with partial update and delete operations scoped by `id_usuario` in `src/main/kotlin/tasks/TaskRepository.kt`
-- [ ] T032 [US4] Implement partial update handling and delete semantics in `src/main/kotlin/tasks/TaskService.kt`
-- [ ] T033 [US4] Implement `PATCH /api/tasks/{id}` and `DELETE /api/tasks/{id}` response handling in `src/main/kotlin/tasks/TaskRoutes.kt`
-- [ ] T034 [US4] Add an integration test for editing and deleting only the authenticated user’s task in `src/test/kotlin/integration/TaskEditDeleteIntegrationTest.kt`
+- [ ] T019 [P] [US2] Definir DTOs de request/response de tarefa e modelos de metadados da lista em `src/main/kotlin/tasks/TaskDtos.kt`
+- [ ] T020 [P] [US2] Implementar o repositório de tarefas com operações de criação e listagem com escopo por dono em `src/main/kotlin/tasks/TaskRepository.kt`
+- [ ] T021 [US2] Implementar o serviço de tarefas para valores padrão de criação, validação de título e atribuição de dono em `src/main/kotlin/tasks/TaskService.kt`
+- [ ] T022 [US2] Implementar as rotas autenticadas `POST /api/tasks` e a rota base `GET /api/tasks` em `src/main/kotlin/tasks/TaskRoutes.kt`
 
-**Checkpoint**: Editing and deletion should be independently testable and owner-safe
-
----
-
-## Phase 7: User Story 5 - Buscar, filtrar e ordenar tarefas (Priority: P5)
-
-**Goal**: Support the full list query contract with filters, search, ordering, and pagination
-
-**Independent Test**: `GET /api/tasks` supports `status`, `prioridade`, `q`, `sort`, `page`, and `limit`, returns `TaskListResponse`, and the `meta` block matches the result set
-
-### Tests for User Story 5
-
-- [ ] T035 [P] [US5] Define contract tests for search, filtering, ordering, and pagination in `src/test/kotlin/contract/TaskQueryContractTest.kt`
-- [ ] T036 [P] [US5] Add unit tests for query normalization, sorting, and pagination meta calculation in `src/test/kotlin/unit/TaskQuerySpecTest.kt`
-
-### Implementation for User Story 5
-
-- [ ] T037 [US5] Extend the task repository listing query builder with filters, text search, ordering, and pagination in `src/main/kotlin/tasks/TaskRepository.kt`
-- [ ] T038 [US5] Implement list query normalization and response metadata assembly in `src/main/kotlin/tasks/TaskService.kt`
-- [ ] T039 [US5] Update `GET /api/tasks` to parse query parameters and return `TaskListResponse` in `src/main/kotlin/tasks/TaskRoutes.kt`
-- [ ] T040 [US5] Add an integration test for combined search/filter/sort/pagination behavior in `src/test/kotlin/integration/TaskQueryIntegrationTest.kt`
-
-**Checkpoint**: The list endpoint should fully match the OpenAPI contract
+**Checkpoint**: Criação de tarefa e listagem apenas do dono devem funcionar de ponta a ponta
 
 ---
 
-## Phase 8: Polish & Cross-Cutting Concerns
+## Fase 5: História de Usuário 3 - Atualizar status da tarefa (Prioridade: P3)
 
-**Purpose**: Improvements that affect multiple user stories
+**Objetivo**: Permitir que o dono atualize o status da tarefa preservando regras de transição e timestamps
 
-- [ ] T041 [P] Remove or replace obsolete sample code and unused helper classes in `src/main/kotlin/HelloService.kt`, `src/main/kotlin/UsersService.kt`, `src/main/kotlin/CitySchema.kt`, `src/main/kotlin/Http.kt`, and `src/main/kotlin/Postgres.kt`
-- [ ] T042 [P] Validate the quickstart flow and reconcile any remaining setup gaps in `specs/001-task-manager-backend-plan/quickstart.md`, `src/main/resources/application.conf`, and `src/main/resources/db/migration/`
-- [ ] T043 [P] Verify snake_case alignment and error-envelope consistency across all DTOs and routes under `src/main/kotlin/`
+**Teste Independente**: `PATCH /api/tasks/{id}` aceita transições válidas, rejeita transições inválidas e atualiza `data_conclusao` ao mover para ou de `CONCLUIDA` conforme as regras do modelo
 
----
+### Testes da História de Usuário 3
 
-## Dependencies & Execution Order
+- [ ] T023 [P] [US3] Definir testes de contrato para transições de status permitidas e não permitidas em `src/test/kotlin/contract/TaskStatusUpdateContractTest.kt`
+- [ ] T024 [P] [US3] Adicionar testes unitários para transições de status de tarefa permitidas e não permitidas em `src/test/kotlin/unit/TaskStatusPolicyTest.kt`
 
-### Phase Dependencies
+### Implementação da História de Usuário 3
 
-- **Setup (Phase 1)**: No dependencies; can start immediately
-- **Foundational (Phase 2)**: Depends on Setup completion; blocks all user stories
-- **User Stories (Phase 3+)**: Depend on the foundational platform pieces; recommended order is P1 → P2 → P3 → P4 → P5
-- **Polish (Final Phase)**: Depends on completion of the desired user stories
+- [ ] T025 [US3] Estender o repositório de tarefas com operações de busca por id e atualização de status com escopo por `id_usuario` em `src/main/kotlin/tasks/TaskRepository.kt`
+- [ ] T026 [US3] Implementar lógica de transição de status da tarefa e manutenção de `data_conclusao` em `src/main/kotlin/tasks/TaskService.kt`
+- [ ] T027 [US3] Implementar o comportamento da rota `PATCH /api/tasks/{id}` com mapeamento de `403` e `404` em `src/main/kotlin/tasks/TaskRoutes.kt`
+- [ ] T028 [US3] Adicionar um teste de integração para atualização de status apenas pelo dono em `src/test/kotlin/integration/TaskStatusUpdateIntegrationTest.kt`
 
-### User Story Dependencies
-
-- **US1 Authentication**: Can start after Foundational; no dependency on task data
-- **US2 Task creation/list baseline**: Can start after Foundational, but is listed after US1 for MVP sequencing
-- **US3 Status updates**: Depends on the task module established in US2
-- **US4 Edit/delete**: Depends on the task module and status handling established in US2-US3
-- **US5 Search/filter/sort**: Depends on the baseline task list implementation from US2 and can reuse the same route and repository layer
-
-### Within Each User Story
-
-- Tests are written before the implementation tasks they validate
-- DTOs and models before service logic
-- Service logic before route wiring
-- Repository changes before route behavior that depends on them
-- Each story should be complete and independently demoable before moving to the next priority
-
-### Parallel Opportunities
-
-- Setup task T003 can run in parallel with other setup work after the initial dependency decision is made
-- Foundational tasks T005-T009 can run in parallel because they touch separate files and layers
-- Within each user story, the contract-test and unit-test tasks can usually run in parallel
-- DTO/model tasks can usually run in parallel with test-writing tasks for the same story
-- Different user stories can be implemented by different developers once the foundational phase is complete
+**Checkpoint**: Atualizações de status devem ser seguras, validadas e persistidas corretamente
 
 ---
 
-## Parallel Example: User Story 2
+## Fase 6: História de Usuário 4 - Editar e excluir tarefa (Prioridade: P4)
+
+**Objetivo**: Permitir que o dono edite parcialmente uma tarefa e a exclua com a semântica HTTP exigida
+
+**Teste Independente**: `PATCH /api/tasks/{id}` retorna a tarefa atualizada em caso de sucesso, e `DELETE /api/tasks/{id}` retorna `204`; ambas as operações rejeitam acesso entre usuários com o envelope de erro de contrato
+
+### Testes da História de Usuário 4
+
+- [ ] T029 [P] [US4] Definir testes de contrato para comportamento de edição parcial e exclusão em `src/test/kotlin/contract/TaskEditDeleteContractTest.kt`
+- [ ] T030 [P] [US4] Adicionar testes unitários para validação parcial, tratamento de não encontrado e comportamento de exclusão em `src/test/kotlin/unit/TaskEditDeleteServiceTest.kt`
+
+### Implementação da História de Usuário 4
+
+- [ ] T031 [US4] Estender o repositório de tarefas com operações de atualização parcial e exclusão com escopo por `id_usuario` em `src/main/kotlin/tasks/TaskRepository.kt`
+- [ ] T032 [US4] Implementar tratamento de atualização parcial e semântica de exclusão em `src/main/kotlin/tasks/TaskService.kt`
+- [ ] T033 [US4] Implementar o tratamento de resposta de `PATCH /api/tasks/{id}` e `DELETE /api/tasks/{id}` em `src/main/kotlin/tasks/TaskRoutes.kt`
+- [ ] T034 [US4] Adicionar um teste de integração para edição e exclusão apenas da tarefa do usuário autenticado em `src/test/kotlin/integration/TaskEditDeleteIntegrationTest.kt`
+
+**Checkpoint**: Edição e exclusão devem ser testáveis de forma independente e seguras para o dono
+
+---
+
+## Fase 7: História de Usuário 5 - Buscar, filtrar e ordenar tarefas (Prioridade: P5)
+
+**Objetivo**: Suportar o contrato completo de consulta de listagem com filtros, busca, ordenação e paginação
+
+**Teste Independente**: `GET /api/tasks` suporta `status`, `prioridade`, `q`, `sort`, `page` e `limit`, retorna `TaskListResponse`, e o bloco `meta` corresponde ao conjunto de resultados
+
+### Testes da História de Usuário 5
+
+- [ ] T035 [P] [US5] Definir testes de contrato para busca, filtragem, ordenação e paginação em `src/test/kotlin/contract/TaskQueryContractTest.kt`
+- [ ] T036 [P] [US5] Adicionar testes unitários para normalização de consulta, ordenação e cálculo de metadados de paginação em `src/test/kotlin/unit/TaskQuerySpecTest.kt`
+
+### Implementação da História de Usuário 5
+
+- [ ] T037 [US5] Estender o construtor de consulta de listagem do repositório de tarefas com filtros, busca textual, ordenação e paginação em `src/main/kotlin/tasks/TaskRepository.kt`
+- [ ] T038 [US5] Implementar normalização da consulta de listagem e montagem dos metadados de resposta em `src/main/kotlin/tasks/TaskService.kt`
+- [ ] T039 [US5] Atualizar `GET /api/tasks` para interpretar parâmetros de query e retornar `TaskListResponse` em `src/main/kotlin/tasks/TaskRoutes.kt`
+- [ ] T040 [US5] Adicionar um teste de integração para comportamento combinado de busca/filtro/ordenação/paginação em `src/test/kotlin/integration/TaskQueryIntegrationTest.kt`
+
+**Checkpoint**: O endpoint de listagem deve corresponder totalmente ao contrato OpenAPI
+
+---
+
+## Fase 8: Acabamento e Preocupações Transversais
+
+**Objetivo**: Melhorias que afetam múltiplas histórias de usuário
+
+- [ ] T041 [P] Remover ou substituir código de exemplo obsoleto e classes helper não utilizadas em `src/main/kotlin/HelloService.kt`, `src/main/kotlin/UsersService.kt`, `src/main/kotlin/CitySchema.kt`, `src/main/kotlin/Http.kt` e `src/main/kotlin/Postgres.kt`
+- [ ] T042 [P] Validar o fluxo de quickstart e reconciliar lacunas de setup restantes em `specs/001-task-manager-backend-plan/quickstart.md`, `src/main/resources/application.conf` e `src/main/resources/db/migration/`
+- [ ] T043 [P] Verificar alinhamento de snake_case e consistência do envelope de erro em todos os DTOs e rotas sob `src/main/kotlin/`
+
+---
+
+## Dependências e Ordem de Execução
+
+### Dependências entre Fases
+
+- **Setup (Fase 1)**: Sem dependências; pode começar imediatamente
+- **Fundacional (Fase 2)**: Depende da conclusão do Setup; bloqueia todas as histórias de usuário
+- **Histórias de Usuário (Fase 3+)**: Dependem dos componentes fundacionais da plataforma; a ordem recomendada é P1 → P2 → P3 → P4 → P5
+- **Acabamento (Fase Final)**: Depende da conclusão das histórias de usuário desejadas
+
+### Dependências entre Histórias de Usuário
+
+- **US1 Autenticação**: Pode começar após a fase Fundacional; sem dependência dos dados de tarefas
+- **US2 Criação/listagem base de tarefas**: Pode começar após a fase Fundacional, mas está listada após a US1 para sequenciamento de MVP
+- **US3 Atualizações de status**: Depende do módulo de tarefas estabelecido na US2
+- **US4 Editar/excluir**: Depende do módulo de tarefas e do tratamento de status estabelecidos em US2-US3
+- **US5 Buscar/filtrar/ordenar**: Depende da implementação base da listagem de tarefas da US2 e pode reutilizar a mesma camada de rota e repositório
+
+### Dentro de Cada História de Usuário
+
+- Os testes são escritos antes das tarefas de implementação que eles validam
+- DTOs e modelos vêm antes da lógica de serviço
+- A lógica de serviço vem antes da integração das rotas
+- Alterações de repositório vêm antes do comportamento de rota que depende delas
+- Cada história deve estar completa e ser demonstrável de forma independente antes de avançar para a próxima prioridade
+
+### Oportunidades de Paralelismo
+
+- A tarefa T003 de Setup pode rodar em paralelo com outros trabalhos de setup após a decisão inicial de dependências
+- As tarefas fundacionais T005-T009 podem rodar em paralelo porque tocam arquivos e camadas separadas
+- Dentro de cada história de usuário, tarefas de teste de contrato e teste unitário normalmente podem rodar em paralelo
+- Tarefas de DTO/modelo normalmente podem rodar em paralelo com tarefas de escrita de testes da mesma história
+- Histórias de usuário diferentes podem ser implementadas por desenvolvedores diferentes após a conclusão da fase fundacional
+
+---
+
+## Exemplo de Paralelismo: História de Usuário 2
 
 ```bash
-# These can proceed together once the foundation is ready:
-Task: "Define task request/response DTOs and list metadata models in `src/main/kotlin/tasks/TaskDtos.kt`"
-Task: "Add an integration test proving a created task is visible only to the owning user in `src/test/kotlin/integration/TaskVisibilityTest.kt`"
+# Estas podem avançar juntas assim que a fundação estiver pronta:
+Tarefa: "Definir DTOs de request/response de tarefa e modelos de metadados da lista em `src/main/kotlin/tasks/TaskDtos.kt`"
+Tarefa: "Adicionar um teste de integração comprovando que uma tarefa criada é visível apenas para o usuário dono em `src/test/kotlin/integration/TaskVisibilityTest.kt`"
 ```
 
 ---
 
-## Implementation Strategy
+## Estratégia de Implementação
 
-### MVP First
+### MVP Primeiro
 
-1. Complete Phase 1: Setup
-2. Complete Phase 2: Foundational
-3. Complete Phase 3: User Story 1
-4. Validate authentication end-to-end before proceeding
+1. Completar Fase 1: Setup
+2. Completar Fase 2: Fundacional
+3. Completar Fase 3: História de Usuário 1
+4. Validar autenticação de ponta a ponta antes de prosseguir
 
-### Incremental Delivery
+### Entrega Incremental
 
-1. Foundation ready
-2. Add authentication and verify login/register independently
-3. Add task creation and baseline owner-only listing
-4. Add status updates
-5. Add edit/delete behavior
-6. Add search/filter/sort and pagination
-7. Finish with polish and cleanup
+1. Fundação pronta
+2. Adicionar autenticação e verificar login/cadastro de forma independente
+3. Adicionar criação de tarefa e listagem base apenas do dono
+4. Adicionar atualizações de status
+5. Adicionar comportamento de edição/exclusão
+6. Adicionar busca/filtro/ordenação e paginação
+7. Finalizar com acabamento e limpeza
 
-### Parallel Team Strategy
+### Estratégia de Time em Paralelo
 
-With multiple developers:
+Com múltiplos desenvolvedores:
 
-1. Team completes Setup + Foundational together
-2. After foundation:
-   - Developer A: Authentication
-   - Developer B: Task creation/list baseline
-   - Developer C: Test scaffolding and contract validation
-3. Later task stories can be split across developers while keeping route/service/repository boundaries clear
+1. O time conclui Setup + Fundacional em conjunto
+2. Após a fundação:
+   - Desenvolvedor A: Autenticação
+   - Desenvolvedor B: Criação/listagem base de tarefas
+   - Desenvolvedor C: Estrutura de testes e validação de contrato
+3. Histórias de tarefa posteriores podem ser divididas entre desenvolvedores mantendo claras as fronteiras de rota/serviço/repositório
 
 ---
 
-## Notes
+## Observações
 
-- `[P]` tasks should touch different files and have no dependency on incomplete work
-- `[Story]` labels are required for user-story phases only
-- Each story should remain independently testable
-- Avoid cross-story coupling that breaks incremental delivery
-- The contract in `contracts/task-manager-api.openapi.yaml` is the source of truth for request/response shapes and HTTP status codes
+- Tarefas `[P]` devem tocar arquivos diferentes e não ter dependência de trabalho incompleto
+- Rótulos `[Story]` são obrigatórios apenas para fases de história de usuário
+- Cada história deve permanecer testável de forma independente
+- Evite acoplamento entre histórias que quebre a entrega incremental
+- O contrato em `contracts/task-manager-api.openapi.yaml` é a fonte da verdade para formatos de request/response e códigos de status HTTP
 
