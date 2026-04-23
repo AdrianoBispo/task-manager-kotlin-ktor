@@ -2,12 +2,11 @@
 
 package com.adrianobispo
 
+import com.adrianobispo.shared.taskManagerJson
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonNamingStrategy
 
 /**
  * Configures Ktor's content negotiation to use JSON serialization with the project's
@@ -15,14 +14,6 @@ import kotlinx.serialization.json.JsonNamingStrategy
  */
 fun Application.configureSerialization() {
     install(ContentNegotiation) {
-        json(
-            Json {
-                prettyPrint = false
-                ignoreUnknownKeys = true
-                explicitNulls = false
-                encodeDefaults = true
-                namingStrategy = JsonNamingStrategy.SnakeCase
-            },
-        )
+        json(taskManagerJson())
     }
 }

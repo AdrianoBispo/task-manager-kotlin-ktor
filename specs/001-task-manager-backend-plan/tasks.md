@@ -34,12 +34,12 @@ description: "Task list for Backend Kotlin/Ktor para Gerenciador de Tarefas"
 
 **⚠️ CRÍTICO**: Nenhum trabalho de história de usuário deve começar até que esta fase esteja concluída
 
-- [ ] T004 Criar a migração inicial do Flyway para usuários e tarefas em `src/main/resources/db/migration/V1__create_task_manager_schema.sql`
-- [ ] T005 [P] Implementar configuração de banco de dados e definições de tabelas Exposed para usuários e tarefas em `src/main/kotlin/shared/DatabaseFactory.kt` e `src/main/kotlin/shared/Tables.kt`
-- [ ] T006 [P] Implementar serialização JSON compartilhada e suporte a DTOs em snake_case em `src/main/kotlin/Serialization.kt` e `src/main/kotlin/shared/JsonConfig.kt`
-- [ ] T007 [P] Implementar modelos centralizados de envelope de erro da API e mapeamentos de StatusPages em `src/main/kotlin/StatusPages.kt` e `src/main/kotlin/shared/ApiError.kt`
-- [ ] T008 [P] Implementar configuração de JWT e helpers de principal autenticado em `src/main/kotlin/Security.kt` e `src/main/kotlin/shared/AuthPrincipal.kt`
-- [ ] T009 [P] Implementar composição de módulos Koin, CORS e registro de rotas da aplicação em `src/main/kotlin/Koin.kt` e `src/main/kotlin/Routing.kt`
+- [X] T004 Criar a migração inicial do Flyway para usuários e tarefas em `src/main/resources/db/migration/V1__create_task_manager_schema.sql`
+- [X] T005 [P] Implementar configuração de banco de dados e definições de tabelas Exposed para usuários e tarefas em `src/main/kotlin/shared/DatabaseFactory.kt` e `src/main/kotlin/shared/Tables.kt`
+- [X] T006 [P] Implementar serialização JSON compartilhada e suporte a DTOs em snake_case em `src/main/kotlin/Serialization.kt` e `src/main/kotlin/shared/JsonConfig.kt`
+- [X] T007 [P] Implementar modelos centralizados de envelope de erro da API e mapeamentos de StatusPages em `src/main/kotlin/StatusPages.kt` e `src/main/kotlin/shared/ApiError.kt`
+- [X] T008 [P] Implementar configuração de JWT e helpers de principal autenticado em `src/main/kotlin/Security.kt` e `src/main/kotlin/shared/AuthPrincipal.kt`
+- [X] T009 [P] Implementar composição de módulos Koin, CORS e registro de rotas da aplicação em `src/main/kotlin/Koin.kt` e `src/main/kotlin/Routing.kt`
 
 **Checkpoint**: Fundação pronta — a implementação das histórias de usuário pode começar
 

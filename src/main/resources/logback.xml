@@ -1,12 +1,25 @@
 <configuration>
+    <!--
+      Console appender used by the application to print all logs to standard output.
+      The pattern includes timestamp, thread, level, logger name and message.
+    -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
+
+    <!--
+      Default logging level for all loggers that do not have an explicit level.
+      Routes logs through the STDOUT appender.
+    -->
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
+
+    <!-- Reduce noise from embedded server/framework internals. -->
     <logger name="org.eclipse.jetty" level="INFO"/>
+
+    <!-- Keep Netty logs at INFO to avoid excessive debug output. -->
     <logger name="io.netty" level="INFO"/>
 </configuration>

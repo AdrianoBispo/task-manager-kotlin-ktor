@@ -71,6 +71,7 @@ dependencies {
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.5"))
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
+    testRuntimeOnly(libs.h2database.h2)
 }
 
 /**
