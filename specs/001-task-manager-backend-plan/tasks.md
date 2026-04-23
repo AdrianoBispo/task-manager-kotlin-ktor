@@ -22,9 +22,9 @@ description: "Task list for Backend Kotlin/Ktor para Gerenciador de Tarefas"
 
 **Objetivo**: Inicialização do projeto e alinhamento com o escopo do backend
 
-- [ ] T001 Atualizar dependências do Gradle e bibliotecas de teste em `build.gradle.kts` para Ktor JWT, StatusPages, CORS, ContentNegotiation, Exposed, Flyway, Koin, bcrypt, MockK e Testcontainers
-- [ ] T002 Configurar propriedades de runtime e placeholders em `src/main/resources/application.conf` para `postgres.url`, `postgres.user`, `postgres.password`, `jwt.secret`, `jwt.issuer`, `jwt.audience` e configurações de CORS
-- [ ] T003 [P] Criar a estrutura de pacotes do backend e os arquivos de bootstrap da aplicação em `src/main/kotlin/main.kt`, `src/main/kotlin/Routing.kt`, `src/main/kotlin/Security.kt`, `src/main/kotlin/StatusPages.kt`, `src/main/kotlin/Serialization.kt`, `src/main/kotlin/Koin.kt`, `src/main/kotlin/auth/`, `src/main/kotlin/tasks/`, `src/main/kotlin/users/` e `src/main/kotlin/shared/`
+- [X] T001 Atualizar dependências do Gradle e bibliotecas de teste em `build.gradle.kts` para Ktor JWT, StatusPages, CORS, ContentNegotiation, Exposed, Flyway, Koin, bcrypt, MockK e Testcontainers
+- [X] T002 Configurar propriedades de runtime e placeholders em `src/main/resources/application.conf` para `postgres.url`, `postgres.user`, `postgres.password`, `jwt.secret`, `jwt.issuer`, `jwt.audience` e configurações de CORS
+- [X] T003 [P] Criar a estrutura de pacotes do backend e os arquivos de bootstrap da aplicação em `src/main/kotlin/main.kt`, `src/main/kotlin/Routing.kt`, `src/main/kotlin/Security.kt`, `src/main/kotlin/StatusPages.kt`, `src/main/kotlin/Serialization.kt`, `src/main/kotlin/Koin.kt`, `src/main/kotlin/auth/`, `src/main/kotlin/tasks/`, `src/main/kotlin/users/` e `src/main/kotlin/shared/`
 
 ---
 

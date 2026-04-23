@@ -3,6 +3,9 @@
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
+# VS Code settings
+.vscode/
+
 # IntelliJ IDEA
 .idea/
 *.iml
