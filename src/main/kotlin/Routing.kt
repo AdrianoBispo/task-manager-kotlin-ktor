@@ -1,9 +1,11 @@
 package com.adrianobispo
 
-import io.ktor.server.application.Application
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.get
-import io.ktor.server.routing.routing
+import com.adrianobispo.auth.AuthService
+import com.adrianobispo.auth.authRoutes
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import org.koin.ktor.ext.inject
 
 /**
  * Configures the application's HTTP routes.
@@ -12,6 +14,8 @@ import io.ktor.server.routing.routing
  * endpoint for basic availability monitoring.
  */
 fun Application.configureRouting() {
+    val authService by inject<AuthService>()
+
     routing {
         get("/") {
             call.respondText("task-manager-backend")
@@ -20,5 +24,7 @@ fun Application.configureRouting() {
         get("/health") {
             call.respondText("ok")
         }
+
+        authRoutes(authService)
     }
 }

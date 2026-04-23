@@ -53,16 +53,23 @@ description: "Task list for Backend Kotlin/Ktor para Gerenciador de Tarefas"
 
 ### Testes da História de Usuário 1
 
-- [ ] T010 [P] [US1] Definir testes de contrato de autenticação para cadastro e login em `src/test/kotlin/contract/AuthContractTest.kt`
-- [ ] T011 [P] [US1] Adicionar testes unitários para validação de cadastro, tratamento de e-mail duplicado e login inválido em `src/test/kotlin/unit/AuthServiceTest.kt`
+- [X] T010 [P] [US1] Definir testes de contrato de autenticação para cadastro e login em
+  `src/test/kotlin/contract/AuthContractTest.kt`
+- [X] T011 [P] [US1] Adicionar testes unitários para validação de cadastro, tratamento de e-mail duplicado e login
+  inválido em `src/test/kotlin/unit/AuthServiceTest.kt`
 
 ### Implementação da História de Usuário 1
 
-- [ ] T012 [P] [US1] Definir DTOs de request/response de autenticação e view models de usuário em `src/main/kotlin/auth/AuthDtos.kt`
-- [ ] T013 [P] [US1] Implementar o repositório de usuários com busca por e-mail único e operações de inserção em `src/main/kotlin/users/UserRepository.kt`
-- [ ] T014 [US1] Implementar o serviço de autenticação com hash bcrypt, verificação de login, emissão de JWT e atualização do último login em `src/main/kotlin/auth/AuthService.kt`
-- [ ] T015 [US1] Implementar as rotas `POST /api/auth/register` e `POST /api/auth/login` em `src/main/kotlin/auth/AuthRoutes.kt`
-- [ ] T016 [US1] Integrar as rotas de autenticação ao módulo da aplicação em `src/main/kotlin/Routing.kt` e `src/main/kotlin/main.kt`
+- [X] T012 [P] [US1] Definir DTOs de request/response de autenticação e view models de usuário em
+  `src/main/kotlin/auth/AuthDtos.kt`
+- [X] T013 [P] [US1] Implementar o repositório de usuários com busca por e-mail único e operações de inserção em
+  `src/main/kotlin/users/UserRepository.kt`
+- [X] T014 [US1] Implementar o serviço de autenticação com hash bcrypt, verificação de login, emissão de JWT e
+  atualização do último login em `src/main/kotlin/auth/AuthService.kt`
+- [X] T015 [US1] Implementar as rotas `POST /api/auth/register` e `POST /api/auth/login` em
+  `src/main/kotlin/auth/AuthRoutes.kt`
+- [X] T016 [US1] Integrar as rotas de autenticação ao módulo da aplicação em `src/main/kotlin/Routing.kt` e
+  `src/main/kotlin/main.kt`
 
 **Checkpoint**: A autenticação deve funcionar de ponta a ponta e ser demonstrável de forma independente
 

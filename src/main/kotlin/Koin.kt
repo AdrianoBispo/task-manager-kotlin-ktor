@@ -1,7 +1,9 @@
 package com.adrianobispo
 
-import io.ktor.server.application.Application
-import io.ktor.server.application.install
+import com.adrianobispo.auth.AuthService
+import com.adrianobispo.users.ExposedUserRepository
+import com.adrianobispo.users.UserRepository
+import io.ktor.server.application.*
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -21,6 +23,10 @@ fun Application.configureKoin() {
             module {
                 single { application }
                 single { application.environment.config }
+                single { application.jwtSettings() }
+
+                single<UserRepository> { ExposedUserRepository() }
+                single { AuthService(get(), get()) }
             },
         )
     }

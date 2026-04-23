@@ -13,6 +13,8 @@ out/
 
 # Kotlin
 *.kotlin_module
+*.class
+*.jar
 
 # Logs
 *.log
@@ -21,6 +23,8 @@ logs/
 # OS files
 .DS_Store
 Thumbs.db
+*.tmp
+*.swp
 
 # Environment and local overrides
 .env
