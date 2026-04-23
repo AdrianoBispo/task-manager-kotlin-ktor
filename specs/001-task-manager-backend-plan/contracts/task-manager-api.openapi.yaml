@@ -1,0 +1,330 @@
+openapi: 3.0.3
+info:
+  title: Task Manager API
+  version: 1.0.0
+  description: Contrato REST para autenticação e gerenciamento de tarefas.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/auth/register:
+    post:
+      summary: Registrar novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Usuário criado e autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '422':
+          $ref: '#/components/responses/ErrorResponse'
+  /api/auth/login:
+    post:
+      summary: Login de usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Usuário autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+  /api/tasks:
+    get:
+      summary: Listar tarefas do usuário autenticado
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/TaskStatus'
+        - in: query
+          name: prioridade
+          schema:
+            $ref: '#/components/schemas/TaskPriority'
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [data_vencimento, data_criacao, -data_vencimento, -data_criacao]
+      responses:
+        '200':
+          description: Lista paginada de tarefas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskListResponse'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+    post:
+      summary: Criar nova tarefa
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Tarefa criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+  /api/tasks/{id}:
+    patch:
+      summary: Atualizar parcialmente tarefa
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: Tarefa atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/ErrorResponse'
+    delete:
+      summary: Excluir tarefa
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Excluída com sucesso
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/ErrorResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    ErrorResponse:
+      description: Resposta padronizada de erro
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [nome, email, senha]
+      properties:
+        nome:
+          type: string
+          minLength: 3
+        email:
+          type: string
+          format: email
+        senha:
+          type: string
+          minLength: 6
+    LoginRequest:
+      type: object
+      required: [email, senha]
+      properties:
+        email:
+          type: string
+          format: email
+        senha:
+          type: string
+    AuthUser:
+      type: object
+      required: [id, nome, email]
+      properties:
+        id:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        email:
+          type: string
+          format: email
+    AuthResponse:
+      type: object
+      required: [usuario, token]
+      properties:
+        usuario:
+          $ref: '#/components/schemas/AuthUser'
+        token:
+          type: string
+    TaskStatus:
+      type: string
+      enum: [PENDENTE, EM_ANDAMENTO, CONCLUIDA]
+    TaskPriority:
+      type: string
+      enum: [BAIXA, MEDIA, ALTA]
+    CreateTaskRequest:
+      type: object
+      required: [titulo]
+      properties:
+        titulo:
+          type: string
+          minLength: 3
+          maxLength: 100
+        descricao:
+          type: string
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        prioridade:
+          $ref: '#/components/schemas/TaskPriority'
+        data_vencimento:
+          type: string
+          format: date-time
+    UpdateTaskRequest:
+      type: object
+      properties:
+        titulo:
+          type: string
+          minLength: 3
+          maxLength: 100
+        descricao:
+          type: string
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        prioridade:
+          $ref: '#/components/schemas/TaskPriority'
+        data_vencimento:
+          type: string
+          format: date-time
+    Task:
+      type: object
+      required:
+        [id, titulo, status, prioridade, data_criacao, data_atualizacao]
+      properties:
+        id:
+          type: string
+          format: uuid
+        titulo:
+          type: string
+        descricao:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        prioridade:
+          $ref: '#/components/schemas/TaskPriority'
+        data_vencimento:
+          type: string
+          format: date-time
+          nullable: true
+        data_criacao:
+          type: string
+          format: date-time
+        data_atualizacao:
+          type: string
+          format: date-time
+        data_conclusao:
+          type: string
+          format: date-time
+          nullable: true
+    TaskListMeta:
+      type: object
+      required: [total_itens, total_paginas, pagina_atual, itens_por_pagina]
+      properties:
+        total_itens:
+          type: integer
+        total_paginas:
+          type: integer
+        pagina_atual:
+          type: integer
+        itens_por_pagina:
+          type: integer
+    TaskListResponse:
+      type: object
+      required: [dados, meta]
+      properties:
+        dados:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+        meta:
+          $ref: '#/components/schemas/TaskListMeta'
+    ErrorDetail:
+      type: object
+      properties:
+        campo:
+          type: string
+        erro:
+          type: string
+    ErrorEnvelope:
+      type: object
+      required: [status, erro, mensagem]
+      properties:
+        status:
+          type: integer
+        erro:
+          type: string
+        mensagem:
+          type: string
+        detalhes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+
