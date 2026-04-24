@@ -5,10 +5,12 @@ import com.adrianobispo.shared.TaskStatus
 import com.adrianobispo.shared.TasksTable
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.update
 import java.time.Instant
 import java.util.UUID
 
@@ -39,6 +41,16 @@ interface TaskRepository {
     ): TaskRecord
 
     fun listByOwner(ownerId: UUID): List<TaskRecord>
+
+    fun findById(taskId: UUID): TaskRecord?
+
+    fun updateStatusByIdAndOwner(
+        taskId: UUID,
+        ownerId: UUID,
+        status: TaskStatus,
+        dataAtualizacao: Instant,
+        dataConclusao: Instant?,
+    ): TaskRecord?
 }
 
 class ExposedTaskRepository : TaskRepository {
@@ -90,6 +102,38 @@ class ExposedTaskRepository : TaskRepository {
             .where { TasksTable.idUsuario eq ownerId }
             .orderBy(TasksTable.dataCriacao to SortOrder.DESC)
             .map { it.toTaskRecord() }
+    }
+
+    override fun findById(taskId: UUID): TaskRecord? = transaction {
+        TasksTable
+            .selectAll()
+            .where { TasksTable.id eq taskId }
+            .singleOrNull()
+            ?.toTaskRecord()
+    }
+
+    override fun updateStatusByIdAndOwner(
+        taskId: UUID,
+        ownerId: UUID,
+        status: TaskStatus,
+        dataAtualizacao: Instant,
+        dataConclusao: Instant?,
+    ): TaskRecord? = transaction {
+        val updatedRows = TasksTable.update({ (TasksTable.id eq taskId) and (TasksTable.idUsuario eq ownerId) }) {
+            it[this.status] = status
+            it[this.dataAtualizacao] = dataAtualizacao
+            it[this.dataConclusao] = dataConclusao
+        }
+
+        if (updatedRows == 0) {
+            null
+        } else {
+            TasksTable
+                .selectAll()
+                .where { (TasksTable.id eq taskId) and (TasksTable.idUsuario eq ownerId) }
+                .single()
+                .toTaskRecord()
+        }
     }
 
     private fun ResultRow.toTaskRecord(): TaskRecord = TaskRecord(

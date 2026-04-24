@@ -105,15 +105,15 @@ description: "Task list for Backend Kotlin/Ktor para Gerenciador de Tarefas"
 
 ### Testes da História de Usuário 3
 
-- [ ] T023 [P] [US3] Definir testes de contrato para transições de status permitidas e não permitidas em `src/test/kotlin/contract/TaskStatusUpdateContractTest.kt`
-- [ ] T024 [P] [US3] Adicionar testes unitários para transições de status de tarefa permitidas e não permitidas em `src/test/kotlin/unit/TaskStatusPolicyTest.kt`
+- [X] T023 [P] [US3] Definir testes de contrato para transições de status permitidas e não permitidas em `src/test/kotlin/contract/TaskStatusUpdateContractTest.kt`
+- [X] T024 [P] [US3] Adicionar testes unitários para transições de status de tarefa permitidas e não permitidas em `src/test/kotlin/unit/TaskStatusPolicyTest.kt`
 
 ### Implementação da História de Usuário 3
 
-- [ ] T025 [US3] Estender o repositório de tarefas com operações de busca por id e atualização de status com escopo por `id_usuario` em `src/main/kotlin/tasks/TaskRepository.kt`
-- [ ] T026 [US3] Implementar lógica de transição de status da tarefa e manutenção de `data_conclusao` em `src/main/kotlin/tasks/TaskService.kt`
-- [ ] T027 [US3] Implementar o comportamento da rota `PATCH /api/tasks/{id}` com mapeamento de `403` e `404` em `src/main/kotlin/tasks/TaskRoutes.kt`
-- [ ] T028 [US3] Adicionar um teste de integração para atualização de status apenas pelo dono em `src/test/kotlin/integration/TaskStatusUpdateIntegrationTest.kt`
+- [X] T025 [US3] Estender o repositório de tarefas com operações de busca por id e atualização de status com escopo por `id_usuario` em `src/main/kotlin/tasks/TaskRepository.kt`
+- [X] T026 [US3] Implementar lógica de transição de status da tarefa e manutenção de `data_conclusao` em `src/main/kotlin/tasks/TaskService.kt`
+- [X] T027 [US3] Implementar o comportamento da rota `PATCH /api/tasks/{id}` com mapeamento de `403` e `404` em `src/main/kotlin/tasks/TaskRoutes.kt`
+- [X] T028 [US3] Adicionar um teste de integração para atualização de status apenas pelo dono em `src/test/kotlin/integration/TaskStatusUpdateIntegrationTest.kt`
 
 **Checkpoint**: Atualizações de status devem ser seguras, validadas e persistidas corretamente
 

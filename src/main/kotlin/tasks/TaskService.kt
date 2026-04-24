@@ -54,6 +54,56 @@ class TaskService(
         )
     }
 
+    fun updateStatus(ownerId: UUID, taskId: UUID, request: UpdateTaskStatusRequestDto): TaskDto {
+        val existingTask = taskRepository.findById(taskId)
+            ?: throw ApiException(
+                status = HttpStatusCode.NotFound,
+                error = "tarefa_nao_encontrada",
+                message = "Tarefa não encontrada",
+            )
+
+        if (existingTask.idUsuario != ownerId) {
+            throw ApiException(
+                status = HttpStatusCode.Forbidden,
+                error = "acesso_negado",
+                message = "Você não tem permissão para alterar esta tarefa",
+            )
+        }
+
+        if (!isStatusTransitionAllowed(existingTask.status, request.status)) {
+            throw ApiException(
+                status = HttpStatusCode.BadRequest,
+                error = "transicao_status_invalida",
+                message = "Transição de status não permitida",
+            )
+        }
+
+        val now = Instant.now()
+        val dataConclusao = when {
+            request.status == TaskStatus.CONCLUIDA && existingTask.status != TaskStatus.CONCLUIDA -> now
+            request.status != TaskStatus.CONCLUIDA -> null
+            else -> existingTask.dataConclusao
+        }
+
+        return taskRepository.updateStatusByIdAndOwner(
+            taskId = taskId,
+            ownerId = ownerId,
+            status = request.status,
+            dataAtualizacao = now,
+            dataConclusao = dataConclusao,
+        )?.toDto() ?: throw ApiException(
+            status = HttpStatusCode.NotFound,
+            error = "tarefa_nao_encontrada",
+            message = "Tarefa não encontrada",
+        )
+    }
+
+    private fun isStatusTransitionAllowed(from: TaskStatus, to: TaskStatus): Boolean = when (from) {
+        TaskStatus.PENDENTE -> to == TaskStatus.EM_ANDAMENTO || to == TaskStatus.CONCLUIDA
+        TaskStatus.EM_ANDAMENTO -> to == TaskStatus.PENDENTE || to == TaskStatus.CONCLUIDA
+        TaskStatus.CONCLUIDA -> to == TaskStatus.EM_ANDAMENTO
+    }
+
     private fun TaskRecord.toDto(): TaskDto = TaskDto(
         id = id.toString(),
         titulo = titulo,

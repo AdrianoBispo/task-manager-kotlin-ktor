@@ -14,6 +14,11 @@ data class CreateTaskRequestDto(
 )
 
 @Serializable
+data class UpdateTaskStatusRequestDto(
+    val status: TaskStatus,
+)
+
+@Serializable
 data class TaskDto(
     val id: String,
     val titulo: String,
