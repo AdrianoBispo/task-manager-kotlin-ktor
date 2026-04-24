@@ -83,15 +83,15 @@ description: "Task list for Backend Kotlin/Ktor para Gerenciador de Tarefas"
 
 ### Testes da História de Usuário 2
 
-- [ ] T017 [P] [US2] Definir testes de contrato para criação de tarefa e listagem autenticada básica em `src/test/kotlin/contract/TaskCreateListContractTest.kt`
-- [ ] T018 [P] [US2] Adicionar um teste de integração comprovando que uma tarefa criada é visível apenas para o usuário dono em `src/test/kotlin/integration/TaskVisibilityTest.kt`
+- [X] T017 [P] [US2] Definir testes de contrato para criação de tarefa e listagem autenticada básica em `src/test/kotlin/contract/TaskCreateListContractTest.kt`
+- [X] T018 [P] [US2] Adicionar um teste de integração comprovando que uma tarefa criada é visível apenas para o usuário dono em `src/test/kotlin/integration/TaskVisibilityTest.kt`
 
 ### Implementação da História de Usuário 2
 
-- [ ] T019 [P] [US2] Definir DTOs de request/response de tarefa e modelos de metadados da lista em `src/main/kotlin/tasks/TaskDtos.kt`
-- [ ] T020 [P] [US2] Implementar o repositório de tarefas com operações de criação e listagem com escopo por dono em `src/main/kotlin/tasks/TaskRepository.kt`
-- [ ] T021 [US2] Implementar o serviço de tarefas para valores padrão de criação, validação de título e atribuição de dono em `src/main/kotlin/tasks/TaskService.kt`
-- [ ] T022 [US2] Implementar as rotas autenticadas `POST /api/tasks` e a rota base `GET /api/tasks` em `src/main/kotlin/tasks/TaskRoutes.kt`
+- [X] T019 [P] [US2] Definir DTOs de request/response de tarefa e modelos de metadados da lista em `src/main/kotlin/tasks/TaskDtos.kt`
+- [X] T020 [P] [US2] Implementar o repositório de tarefas com operações de criação e listagem com escopo por dono em `src/main/kotlin/tasks/TaskRepository.kt`
+- [X] T021 [US2] Implementar o serviço de tarefas para valores padrão de criação, validação de título e atribuição de dono em `src/main/kotlin/tasks/TaskService.kt`
+- [X] T022 [US2] Implementar as rotas autenticadas `POST /api/tasks` e a rota base `GET /api/tasks` em `src/main/kotlin/tasks/TaskRoutes.kt`
 
 **Checkpoint**: Criação de tarefa e listagem apenas do dono devem funcionar de ponta a ponta
 

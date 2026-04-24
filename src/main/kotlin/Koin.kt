@@ -1,6 +1,9 @@
 package com.adrianobispo
 
 import com.adrianobispo.auth.AuthService
+import com.adrianobispo.tasks.ExposedTaskRepository
+import com.adrianobispo.tasks.TaskRepository
+import com.adrianobispo.tasks.TaskService
 import com.adrianobispo.users.ExposedUserRepository
 import com.adrianobispo.users.UserRepository
 import io.ktor.server.application.*
@@ -26,7 +29,9 @@ fun Application.configureKoin() {
                 single { application.jwtSettings() }
 
                 single<UserRepository> { ExposedUserRepository() }
+                single<TaskRepository> { ExposedTaskRepository() }
                 single { AuthService(get(), get()) }
+                single { TaskService(get()) }
             },
         )
     }
