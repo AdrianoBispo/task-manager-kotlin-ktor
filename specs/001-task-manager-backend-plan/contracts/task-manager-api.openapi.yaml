@@ -1,11 +1,15 @@
 openapi: 3.0.3
+# Metadados principais da API e versão do contrato.
 info:
   title: Task Manager API
   version: 1.0.0
   description: Contrato REST para autenticação e gerenciamento de tarefas.
+# Servidor base utilizado durante desenvolvimento local.
 servers:
   - url: http://localhost:8080
+# Definição dos endpoints disponíveis na API.
 paths:
+  # Endpoint para cadastro de usuário e retorno do token JWT.
   /api/auth/register:
     post:
       summary: Registrar novo usuário
@@ -26,6 +30,7 @@ paths:
           $ref: '#/components/responses/ErrorResponse'
         '422':
           $ref: '#/components/responses/ErrorResponse'
+  # Endpoint para autenticação de usuário existente.
   /api/auth/login:
     post:
       summary: Login de usuário
@@ -44,8 +49,10 @@ paths:
                 $ref: '#/components/schemas/AuthResponse'
         '401':
           $ref: '#/components/responses/ErrorResponse'
+  # Endpoints de coleção de tarefas (listar e criar).
   /api/tasks:
     get:
+      # Lista tarefas do usuário autenticado com filtros, paginação e ordenação.
       summary: Listar tarefas do usuário autenticado
       security:
         - bearerAuth: []
@@ -58,6 +65,10 @@ paths:
           name: prioridade
           schema:
             $ref: '#/components/schemas/TaskPriority'
+        - in: query
+          name: q
+          schema:
+            type: string
         - in: query
           name: page
           schema:
@@ -85,6 +96,7 @@ paths:
         '401':
           $ref: '#/components/responses/ErrorResponse'
     post:
+      # Cria uma nova tarefa vinculada ao usuário autenticado.
       summary: Criar nova tarefa
       security:
         - bearerAuth: []
@@ -105,8 +117,10 @@ paths:
           $ref: '#/components/responses/ErrorResponse'
         '401':
           $ref: '#/components/responses/ErrorResponse'
+  # Endpoints de recurso individual de tarefa (atualizar e excluir).
   /api/tasks/{id}:
     patch:
+      # Atualiza parcialmente uma tarefa específica do usuário autenticado.
       summary: Atualizar parcialmente tarefa
       security:
         - bearerAuth: []
@@ -139,6 +153,7 @@ paths:
         '404':
           $ref: '#/components/responses/ErrorResponse'
     delete:
+      # Remove definitivamente uma tarefa específica do usuário autenticado.
       summary: Excluir tarefa
       security:
         - bearerAuth: []
@@ -158,12 +173,15 @@ paths:
           $ref: '#/components/responses/ErrorResponse'
         '404':
           $ref: '#/components/responses/ErrorResponse'
+# Componentes reutilizáveis do contrato (segurança, respostas e modelos).
 components:
+  # Esquemas de autenticação aceitos pela API.
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  # Respostas reutilizáveis para padronizar retornos de erro.
   responses:
     ErrorResponse:
       description: Resposta padronizada de erro
@@ -171,7 +189,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorEnvelope'
+  # Modelos de dados usados em requests e responses.
   schemas:
+    # Payload para criação de conta.
     RegisterRequest:
       type: object
       required: [nome, email, senha]
@@ -185,6 +205,7 @@ components:
         senha:
           type: string
           minLength: 6
+    # Payload para autenticação.
     LoginRequest:
       type: object
       required: [email, senha]
@@ -194,6 +215,7 @@ components:
           format: email
         senha:
           type: string
+    # Dados públicos do usuário autenticado.
     AuthUser:
       type: object
       required: [id, nome, email]
@@ -206,6 +228,7 @@ components:
         email:
           type: string
           format: email
+    # Resposta de autenticação contendo usuário e token JWT.
     AuthResponse:
       type: object
       required: [usuario, token]
@@ -214,12 +237,15 @@ components:
           $ref: '#/components/schemas/AuthUser'
         token:
           type: string
+    # Estados possíveis do ciclo de vida da tarefa.
     TaskStatus:
       type: string
       enum: [PENDENTE, EM_ANDAMENTO, CONCLUIDA]
+    # Prioridades permitidas para uma tarefa.
     TaskPriority:
       type: string
       enum: [BAIXA, MEDIA, ALTA]
+    # Payload para criação de tarefa.
     CreateTaskRequest:
       type: object
       required: [titulo]
@@ -237,6 +263,7 @@ components:
         data_vencimento:
           type: string
           format: date-time
+    # Payload para atualização parcial de tarefa.
     UpdateTaskRequest:
       type: object
       properties:
@@ -253,6 +280,7 @@ components:
         data_vencimento:
           type: string
           format: date-time
+    # Representação completa de uma tarefa no sistema.
     Task:
       type: object
       required:
@@ -284,6 +312,7 @@ components:
           type: string
           format: date-time
           nullable: true
+    # Metadados de paginação da listagem de tarefas.
     TaskListMeta:
       type: object
       required: [total_itens, total_paginas, pagina_atual, itens_por_pagina]
@@ -296,6 +325,7 @@ components:
           type: integer
         itens_por_pagina:
           type: integer
+    # Envelope de resposta para listas paginadas de tarefas.
     TaskListResponse:
       type: object
       required: [dados, meta]
@@ -306,6 +336,7 @@ components:
             $ref: '#/components/schemas/Task'
         meta:
           $ref: '#/components/schemas/TaskListMeta'
+    # Detalhe de validação/erro por campo.
     ErrorDetail:
       type: object
       properties:
@@ -313,6 +344,7 @@ components:
           type: string
         erro:
           type: string
+    # Envelope padronizado de erro retornado pela API.
     ErrorEnvelope:
       type: object
       required: [status, erro, mensagem]
