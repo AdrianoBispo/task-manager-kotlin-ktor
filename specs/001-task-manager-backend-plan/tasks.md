@@ -127,15 +127,15 @@ description: "Task list for Backend Kotlin/Ktor para Gerenciador de Tarefas"
 
 ### Testes da História de Usuário 4
 
-- [ ] T029 [P] [US4] Definir testes de contrato para comportamento de edição parcial e exclusão em `src/test/kotlin/contract/TaskEditDeleteContractTest.kt`
-- [ ] T030 [P] [US4] Adicionar testes unitários para validação parcial, tratamento de não encontrado e comportamento de exclusão em `src/test/kotlin/unit/TaskEditDeleteServiceTest.kt`
+- [X] T029 [P] [US4] Definir testes de contrato para comportamento de edição parcial e exclusão em `src/test/kotlin/contract/TaskEditDeleteContractTest.kt`
+- [X] T030 [P] [US4] Adicionar testes unitários para validação parcial, tratamento de não encontrado e comportamento de exclusão em `src/test/kotlin/unit/TaskEditDeleteServiceTest.kt`
 
 ### Implementação da História de Usuário 4
 
-- [ ] T031 [US4] Estender o repositório de tarefas com operações de atualização parcial e exclusão com escopo por `id_usuario` em `src/main/kotlin/tasks/TaskRepository.kt`
-- [ ] T032 [US4] Implementar tratamento de atualização parcial e semântica de exclusão em `src/main/kotlin/tasks/TaskService.kt`
-- [ ] T033 [US4] Implementar o tratamento de resposta de `PATCH /api/tasks/{id}` e `DELETE /api/tasks/{id}` em `src/main/kotlin/tasks/TaskRoutes.kt`
-- [ ] T034 [US4] Adicionar um teste de integração para edição e exclusão apenas da tarefa do usuário autenticado em `src/test/kotlin/integration/TaskEditDeleteIntegrationTest.kt`
+- [X] T031 [US4] Estender o repositório de tarefas com operações de atualização parcial e exclusão com escopo por `id_usuario` em `src/main/kotlin/tasks/TaskRepository.kt`
+- [X] T032 [US4] Implementar tratamento de atualização parcial e semântica de exclusão em `src/main/kotlin/tasks/TaskService.kt`
+- [X] T033 [US4] Implementar o tratamento de resposta de `PATCH /api/tasks/{id}` e `DELETE /api/tasks/{id}` em `src/main/kotlin/tasks/TaskRoutes.kt`
+- [X] T034 [US4] Adicionar um teste de integração para edição e exclusão apenas da tarefa do usuário autenticado em `src/test/kotlin/integration/TaskEditDeleteIntegrationTest.kt`
 
 **Checkpoint**: Edição e exclusão devem ser testáveis de forma independente e seguras para o dono
 

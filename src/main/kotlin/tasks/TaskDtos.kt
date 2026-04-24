@@ -19,6 +19,15 @@ data class UpdateTaskStatusRequestDto(
 )
 
 @Serializable
+data class UpdateTaskRequestDto(
+    val titulo: String? = null,
+    val descricao: String? = null,
+    val status: TaskStatus? = null,
+    val prioridade: TaskPriority? = null,
+    val dataVencimento: String? = null,
+)
+
+@Serializable
 data class TaskDto(
     val id: String,
     val titulo: String,

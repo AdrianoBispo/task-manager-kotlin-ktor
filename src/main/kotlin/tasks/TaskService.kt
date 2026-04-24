@@ -55,6 +55,10 @@ class TaskService(
     }
 
     fun updateStatus(ownerId: UUID, taskId: UUID, request: UpdateTaskStatusRequestDto): TaskDto {
+        return updateTask(ownerId, taskId, UpdateTaskRequestDto(status = request.status))
+    }
+
+    fun updateTask(ownerId: UUID, taskId: UUID, request: UpdateTaskRequestDto): TaskDto {
         val existingTask = taskRepository.findById(taskId)
             ?: throw ApiException(
                 status = HttpStatusCode.NotFound,
@@ -70,7 +74,33 @@ class TaskService(
             )
         }
 
-        if (!isStatusTransitionAllowed(existingTask.status, request.status)) {
+        if (
+            request.titulo == null &&
+            request.descricao == null &&
+            request.status == null &&
+            request.prioridade == null &&
+            request.dataVencimento == null
+        ) {
+            throw ApiException(
+                status = HttpStatusCode.BadRequest,
+                error = "validacao",
+                message = "Pelo menos um campo deve ser informado para atualização",
+            )
+        }
+
+        val updatedTitulo = request.titulo?.trim()?.also {
+            if (it.length !in 3..100) {
+                throw ApiException(
+                    status = HttpStatusCode.BadRequest,
+                    error = "validacao",
+                    message = "Título deve ter entre 3 e 100 caracteres",
+                )
+            }
+        } ?: existingTask.titulo
+
+        val requestedStatus = request.status ?: existingTask.status
+
+        if (requestedStatus != existingTask.status && !isStatusTransitionAllowed(existingTask.status, requestedStatus)) {
             throw ApiException(
                 status = HttpStatusCode.BadRequest,
                 error = "transicao_status_invalida",
@@ -78,17 +108,31 @@ class TaskService(
             )
         }
 
+        val dataVencimento = request.dataVencimento?.let {
+            runCatching { Instant.parse(it) }.getOrElse {
+                throw ApiException(
+                    status = HttpStatusCode.BadRequest,
+                    error = "validacao",
+                    message = "data_vencimento inválida",
+                )
+            }
+        }
+
         val now = Instant.now()
         val dataConclusao = when {
-            request.status == TaskStatus.CONCLUIDA && existingTask.status != TaskStatus.CONCLUIDA -> now
-            request.status != TaskStatus.CONCLUIDA -> null
+            requestedStatus == TaskStatus.CONCLUIDA && existingTask.status != TaskStatus.CONCLUIDA -> now
+            requestedStatus != TaskStatus.CONCLUIDA -> null
             else -> existingTask.dataConclusao
         }
 
-        return taskRepository.updateStatusByIdAndOwner(
+        return taskRepository.updateByIdAndOwner(
             taskId = taskId,
             ownerId = ownerId,
-            status = request.status,
+            titulo = updatedTitulo,
+            descricao = request.descricao?.trim()?.ifBlank { null } ?: existingTask.descricao,
+            status = requestedStatus,
+            prioridade = request.prioridade ?: existingTask.prioridade,
+            dataVencimento = dataVencimento ?: existingTask.dataVencimento,
             dataAtualizacao = now,
             dataConclusao = dataConclusao,
         )?.toDto() ?: throw ApiException(
@@ -96,6 +140,31 @@ class TaskService(
             error = "tarefa_nao_encontrada",
             message = "Tarefa não encontrada",
         )
+    }
+
+    fun delete(ownerId: UUID, taskId: UUID) {
+        val existingTask = taskRepository.findById(taskId)
+            ?: throw ApiException(
+                status = HttpStatusCode.NotFound,
+                error = "tarefa_nao_encontrada",
+                message = "Tarefa não encontrada",
+            )
+
+        if (existingTask.idUsuario != ownerId) {
+            throw ApiException(
+                status = HttpStatusCode.Forbidden,
+                error = "acesso_negado",
+                message = "Você não tem permissão para excluir esta tarefa",
+            )
+        }
+
+        if (!taskRepository.deleteByIdAndOwner(taskId, ownerId)) {
+            throw ApiException(
+                status = HttpStatusCode.NotFound,
+                error = "tarefa_nao_encontrada",
+                message = "Tarefa não encontrada",
+            )
+        }
     }
 
     private fun isStatusTransitionAllowed(from: TaskStatus, to: TaskStatus): Boolean = when (from) {

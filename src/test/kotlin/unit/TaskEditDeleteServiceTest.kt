@@ -6,82 +6,94 @@ import com.adrianobispo.shared.TaskStatus
 import com.adrianobispo.tasks.TaskRecord
 import com.adrianobispo.tasks.TaskRepository
 import com.adrianobispo.tasks.TaskService
-import com.adrianobispo.tasks.UpdateTaskStatusRequestDto
+import com.adrianobispo.tasks.UpdateTaskRequestDto
 import io.ktor.http.HttpStatusCode
 import java.time.Instant
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class TaskStatusPolicyTest {
+class TaskEditDeleteServiceTest {
     @Test
-    fun `allows valid transition to CONCLUIDA and sets data_conclusao`() {
+    fun `partial update validates title length`() {
         val ownerId = UUID.randomUUID()
-        val task = baseTask(ownerId = ownerId, status = TaskStatus.PENDENTE, dataConclusao = null)
-        val repository = FakeTaskRepository(task)
+        val task = baseTask(ownerId)
+        val repository = EditDeleteFakeTaskRepository(task)
         val service = TaskService(repository)
 
-        val updated = service.updateStatus(ownerId, task.id, UpdateTaskStatusRequestDto(status = TaskStatus.CONCLUIDA))
-
-        assertEquals(TaskStatus.CONCLUIDA, updated.status)
-        assertNotNull(updated.dataConclusao)
-        assertEquals(TaskStatus.CONCLUIDA, repository.records[task.id]?.status)
-        assertNotNull(repository.records[task.id]?.dataConclusao)
-    }
-
-    @Test
-    fun `allows transition away from CONCLUIDA and clears data_conclusao`() {
-        val ownerId = UUID.randomUUID()
-        val task = baseTask(ownerId = ownerId, status = TaskStatus.CONCLUIDA, dataConclusao = Instant.now())
-        val repository = FakeTaskRepository(task)
-        val service = TaskService(repository)
-
-        val updated = service.updateStatus(ownerId, task.id, UpdateTaskStatusRequestDto(status = TaskStatus.EM_ANDAMENTO))
-
-        assertEquals(TaskStatus.EM_ANDAMENTO, updated.status)
-        assertNull(updated.dataConclusao)
-        assertNull(repository.records[task.id]?.dataConclusao)
-    }
-
-    @Test
-    fun `rejects disallowed transition from CONCLUIDA to PENDENTE`() {
-        val ownerId = UUID.randomUUID()
-        val task = baseTask(ownerId = ownerId, status = TaskStatus.CONCLUIDA, dataConclusao = Instant.now())
-        val repository = FakeTaskRepository(task)
-        val service = TaskService(repository)
-
-        val error = kotlin.runCatching {
-            service.updateStatus(ownerId, task.id, UpdateTaskStatusRequestDto(status = TaskStatus.PENDENTE))
+        val error = runCatching {
+            service.updateTask(ownerId, task.id, UpdateTaskRequestDto(titulo = "x"))
         }.exceptionOrNull() as? ApiException
 
         assertNotNull(error)
         assertEquals(HttpStatusCode.BadRequest, error.status)
-        assertTrue(error.message.contains("Transição de status"))
-        assertEquals(TaskStatus.CONCLUIDA, repository.records[task.id]?.status)
+        assertTrue(error.message.contains("Título"))
+        assertEquals("Tarefa original", repository.records[task.id]?.titulo)
     }
 
-    private fun baseTask(ownerId: UUID, status: TaskStatus, dataConclusao: Instant?): TaskRecord {
+    @Test
+    fun `partial update returns not found for missing task`() {
+        val repository = EditDeleteFakeTaskRepository()
+        val service = TaskService(repository)
+
+        val error = runCatching {
+            service.updateTask(UUID.randomUUID(), UUID.randomUUID(), UpdateTaskRequestDto(titulo = "Nova tarefa"))
+        }.exceptionOrNull() as? ApiException
+
+        assertNotNull(error)
+        assertEquals(HttpStatusCode.NotFound, error.status)
+    }
+
+    @Test
+    fun `delete rejects non owner`() {
+        val ownerId = UUID.randomUUID()
+        val otherId = UUID.randomUUID()
+        val task = baseTask(ownerId)
+        val repository = EditDeleteFakeTaskRepository(task)
+        val service = TaskService(repository)
+
+        val error = runCatching {
+            service.delete(otherId, task.id)
+        }.exceptionOrNull() as? ApiException
+
+        assertNotNull(error)
+        assertEquals(HttpStatusCode.Forbidden, error.status)
+        assertTrue(repository.records.containsKey(task.id))
+    }
+
+    @Test
+    fun `delete removes task for owner`() {
+        val ownerId = UUID.randomUUID()
+        val task = baseTask(ownerId)
+        val repository = EditDeleteFakeTaskRepository(task)
+        val service = TaskService(repository)
+
+        service.delete(ownerId, task.id)
+
+        assertTrue(!repository.records.containsKey(task.id))
+    }
+
+    private fun baseTask(ownerId: UUID): TaskRecord {
         val now = Instant.now()
         return TaskRecord(
             id = UUID.randomUUID(),
             idUsuario = ownerId,
-            titulo = "Tarefa",
-            descricao = null,
-            status = status,
+            titulo = "Tarefa original",
+            descricao = "Descrição",
+            status = TaskStatus.PENDENTE,
             prioridade = TaskPriority.MEDIA,
             dataVencimento = null,
             dataCriacao = now,
             dataAtualizacao = now,
-            dataConclusao = dataConclusao,
+            dataConclusao = null,
         )
     }
 }
 
-private class FakeTaskRepository(task: TaskRecord) : TaskRepository {
-    val records: MutableMap<UUID, TaskRecord> = mutableMapOf(task.id to task)
+private class EditDeleteFakeTaskRepository(vararg tasks: TaskRecord) : TaskRepository {
+    val records: MutableMap<UUID, TaskRecord> = tasks.associateBy { it.id }.toMutableMap()
 
     override fun create(
         ownerId: UUID,
@@ -93,7 +105,18 @@ private class FakeTaskRepository(task: TaskRecord) : TaskRepository {
         dataCriacao: Instant,
         dataAtualizacao: Instant,
         dataConclusao: Instant?,
-    ): TaskRecord = error("Not needed for this test")
+    ): TaskRecord = TaskRecord(
+        id = UUID.randomUUID(),
+        idUsuario = ownerId,
+        titulo = titulo,
+        descricao = descricao,
+        status = status,
+        prioridade = prioridade,
+        dataVencimento = dataVencimento,
+        dataCriacao = dataCriacao,
+        dataAtualizacao = dataAtualizacao,
+        dataConclusao = dataConclusao,
+    )
 
     override fun listByOwner(ownerId: UUID): List<TaskRecord> = records.values.filter { it.idUsuario == ownerId }
 
@@ -108,15 +131,15 @@ private class FakeTaskRepository(task: TaskRecord) : TaskRepository {
     ): TaskRecord? {
         val existing = records[taskId] ?: return null
         return updateByIdAndOwner(
-            taskId = taskId,
-            ownerId = ownerId,
-            titulo = existing.titulo,
-            descricao = existing.descricao,
-            status = status,
-            prioridade = existing.prioridade,
-            dataVencimento = existing.dataVencimento,
-            dataAtualizacao = dataAtualizacao,
-            dataConclusao = dataConclusao,
+            taskId,
+            ownerId,
+            existing.titulo,
+            existing.descricao,
+            status,
+            existing.prioridade,
+            existing.dataVencimento,
+            dataAtualizacao,
+            dataConclusao,
         )
     }
 
@@ -133,6 +156,7 @@ private class FakeTaskRepository(task: TaskRecord) : TaskRepository {
     ): TaskRecord? {
         val existing = records[taskId] ?: return null
         if (existing.idUsuario != ownerId) return null
+
         return existing.copy(
             titulo = titulo,
             descricao = descricao,
@@ -151,4 +175,5 @@ private class FakeTaskRepository(task: TaskRecord) : TaskRepository {
         return true
     }
 }
+
 

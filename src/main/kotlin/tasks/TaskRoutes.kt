@@ -7,6 +7,7 @@ import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
@@ -35,9 +36,19 @@ fun Route.taskRoutes(taskService: TaskService) {
                     runCatching { UUID.fromString(it) }.getOrNull()
                 } ?: throw IllegalArgumentException("ID da tarefa inválido")
 
-                val request = call.receive<UpdateTaskStatusRequestDto>()
-                val response = taskService.updateStatus(principal.userId, taskId, request)
+                val request = call.receive<UpdateTaskRequestDto>()
+                val response = taskService.updateTask(principal.userId, taskId, request)
                 call.respond(HttpStatusCode.OK, response)
+            }
+
+            delete("/{id}") {
+                val principal = call.principal<AuthPrincipal>() ?: error("Usuário autenticado não disponível")
+                val taskId = call.parameters["id"]?.let {
+                    runCatching { UUID.fromString(it) }.getOrNull()
+                } ?: throw IllegalArgumentException("ID da tarefa inválido")
+
+                taskService.delete(principal.userId, taskId)
+                call.respond(HttpStatusCode.NoContent)
             }
         }
     }

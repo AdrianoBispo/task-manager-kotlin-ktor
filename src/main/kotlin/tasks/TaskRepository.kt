@@ -7,6 +7,7 @@ import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -51,6 +52,20 @@ interface TaskRepository {
         dataAtualizacao: Instant,
         dataConclusao: Instant?,
     ): TaskRecord?
+
+    fun updateByIdAndOwner(
+        taskId: UUID,
+        ownerId: UUID,
+        titulo: String,
+        descricao: String?,
+        status: TaskStatus,
+        prioridade: TaskPriority,
+        dataVencimento: Instant?,
+        dataAtualizacao: Instant,
+        dataConclusao: Instant?,
+    ): TaskRecord?
+
+    fun deleteByIdAndOwner(taskId: UUID, ownerId: UUID): Boolean
 }
 
 class ExposedTaskRepository : TaskRepository {
@@ -119,8 +134,43 @@ class ExposedTaskRepository : TaskRepository {
         dataAtualizacao: Instant,
         dataConclusao: Instant?,
     ): TaskRecord? = transaction {
+        val current = TasksTable
+            .selectAll()
+            .where { (TasksTable.id eq taskId) and (TasksTable.idUsuario eq ownerId) }
+            .singleOrNull()
+            ?.toTaskRecord()
+            ?: return@transaction null
+
+        updateByIdAndOwner(
+            taskId = taskId,
+            ownerId = ownerId,
+            titulo = current.titulo,
+            descricao = current.descricao,
+            status = status,
+            prioridade = current.prioridade,
+            dataVencimento = current.dataVencimento,
+            dataAtualizacao = dataAtualizacao,
+            dataConclusao = dataConclusao,
+        )
+    }
+
+    override fun updateByIdAndOwner(
+        taskId: UUID,
+        ownerId: UUID,
+        titulo: String,
+        descricao: String?,
+        status: TaskStatus,
+        prioridade: TaskPriority,
+        dataVencimento: Instant?,
+        dataAtualizacao: Instant,
+        dataConclusao: Instant?,
+    ): TaskRecord? = transaction {
         val updatedRows = TasksTable.update({ (TasksTable.id eq taskId) and (TasksTable.idUsuario eq ownerId) }) {
+            it[this.titulo] = titulo
+            it[this.descricao] = descricao
             it[this.status] = status
+            it[this.prioridade] = prioridade
+            it[this.dataVencimento] = dataVencimento
             it[this.dataAtualizacao] = dataAtualizacao
             it[this.dataConclusao] = dataConclusao
         }
@@ -134,6 +184,10 @@ class ExposedTaskRepository : TaskRepository {
                 .single()
                 .toTaskRecord()
         }
+    }
+
+    override fun deleteByIdAndOwner(taskId: UUID, ownerId: UUID): Boolean = transaction {
+        TasksTable.deleteWhere { (TasksTable.id eq taskId) and (TasksTable.idUsuario eq ownerId) } > 0
     }
 
     private fun ResultRow.toTaskRecord(): TaskRecord = TaskRecord(
