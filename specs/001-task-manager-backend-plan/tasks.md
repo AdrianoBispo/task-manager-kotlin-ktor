@@ -167,9 +167,9 @@ description: "Task list for Backend Kotlin/Ktor para Gerenciador de Tarefas"
 
 **Objetivo**: Melhorias que afetam múltiplas histórias de usuário
 
-- [ ] T041 [P] Remover ou substituir código de exemplo obsoleto e classes helper não utilizadas em `src/main/kotlin/HelloService.kt`, `src/main/kotlin/UsersService.kt`, `src/main/kotlin/CitySchema.kt`, `src/main/kotlin/Http.kt` e `src/main/kotlin/Postgres.kt`
-- [ ] T042 [P] Validar o fluxo de quickstart e reconciliar lacunas de setup restantes em `specs/001-task-manager-backend-plan/quickstart.md`, `src/main/resources/application.conf` e `src/main/resources/db/migration/`
-- [ ] T043 [P] Verificar alinhamento de snake_case e consistência do envelope de erro em todos os DTOs e rotas sob `src/main/kotlin/`
+- [X] T041 [P] Remover ou substituir código de exemplo obsoleto e classes helper não utilizadas em `src/main/kotlin/HelloService.kt`, `src/main/kotlin/UsersService.kt`, `src/main/kotlin/CitySchema.kt`, `src/main/kotlin/Http.kt` e `src/main/kotlin/Postgres.kt`
+- [X] T042 [P] Validar o fluxo de quickstart e reconciliar lacunas de setup restantes em `specs/001-task-manager-backend-plan/quickstart.md`, `src/main/resources/application.conf` e `src/main/resources/db/migration/`
+- [X] T043 [P] Verificar alinhamento de snake_case e consistência do envelope de erro em todos os DTOs e rotas sob `src/main/kotlin/`
 
 ---
 

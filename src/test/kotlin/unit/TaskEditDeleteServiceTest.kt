@@ -8,6 +8,7 @@ import com.adrianobispo.tasks.TaskRepository
 import com.adrianobispo.tasks.TaskListQuery
 import com.adrianobispo.tasks.TaskListResult
 import com.adrianobispo.tasks.TaskService
+import com.adrianobispo.tasks.CreateTaskRequestDto
 import com.adrianobispo.tasks.UpdateTaskRequestDto
 import io.ktor.http.HttpStatusCode
 import java.time.Instant
@@ -18,6 +19,27 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class TaskEditDeleteServiceTest {
+    @Test
+    fun `create rejects invalid data_vencimento with bad request`() {
+        val repository = EditDeleteFakeTaskRepository()
+        val service = TaskService(repository)
+
+        val error = runCatching {
+            service.create(
+                ownerId = UUID.randomUUID(),
+                request = CreateTaskRequestDto(
+                    titulo = "Tarefa válida",
+                    dataVencimento = "2026-13-99T00:00:00Z",
+                ),
+            )
+        }.exceptionOrNull() as? ApiException
+
+        assertNotNull(error)
+        assertEquals(HttpStatusCode.BadRequest, error.status)
+        assertEquals("validacao", error.error)
+        assertTrue(error.message.contains("data_vencimento"))
+    }
+
     @Test
     fun `partial update validates title length`() {
         val ownerId = UUID.randomUUID()

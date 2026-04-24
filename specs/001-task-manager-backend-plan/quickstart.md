@@ -8,14 +8,33 @@
 
 ## 2. Configuração
 
-1. Ajustar `src/main/resources/application.conf` com JWT e banco:
-   - `jwt.secret`
-   - `jwt.issuer`
-   - `jwt.audience`
-   - `postgres.url`
-   - `postgres.user`
-   - `postgres.password`
-2. Garantir diretório de migrações Flyway em `src/main/resources/db/migration`.
+1. Definir variáveis de ambiente (recomendado, sem editar arquivo versionado):
+
+```bash
+export JWT_SECRET="task-manager-dev-secret"
+export JWT_ISSUER="task-manager"
+export JWT_AUDIENCE="task-manager-users"
+export JWT_REALM="task-manager"
+
+export POSTGRES_URL="jdbc:postgresql://localhost:5432/task_manager"
+export POSTGRES_USER="task_manager"
+export POSTGRES_PASSWORD="task_manager"
+
+export CORS_ALLOWED_HOSTS="localhost:3000,127.0.0.1:3000,localhost:5173,127.0.0.1:5173"
+```
+
+2. Subir PostgreSQL local (exemplo rápido com Docker):
+
+```bash
+docker run --name task-manager-postgres \
+  -e POSTGRES_DB=task_manager \
+  -e POSTGRES_USER=task_manager \
+  -e POSTGRES_PASSWORD=task_manager \
+  -p 5432:5432 \
+  -d postgres:16
+```
+
+3. Confirmar migrações Flyway disponíveis em `src/main/resources/db/migration/` (atual: `V1__create_task_manager_schema.sql`).
 
 ## 3. Executar aplicação
 
@@ -24,6 +43,8 @@
 ```
 
 Servidor esperado em `http://localhost:8080`.
+
+No startup, o Flyway deve aplicar migrações e criar tabelas `usuarios` e `tarefas`.
 
 ## 4. Fluxo mínimo de validação manual
 
@@ -63,6 +84,12 @@ curl -X GET "http://localhost:8080/api/tasks?page=1&limit=10&status=PENDENTE" \
 
 ```bash
 ./gradlew test
+```
+
+Para validar só o fluxo de contrato HTTP:
+
+```bash
+./gradlew test --tests "com.adrianobispo.contract.*"
 ```
 
 ## 6. Critérios de pronto (planning)

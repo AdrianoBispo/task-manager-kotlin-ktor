@@ -1,6 +1,7 @@
 package com.adrianobispo.tasks
 
 import com.adrianobispo.shared.AuthPrincipal
+import com.adrianobispo.shared.ApiException
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
@@ -18,14 +19,14 @@ fun Route.taskRoutes(taskService: TaskService) {
     authenticate("auth-jwt") {
         route("/api/tasks") {
             post {
-                val principal = call.principal<AuthPrincipal>() ?: error("Usuário autenticado não disponível")
+                val principal = call.requireAuthPrincipal()
                 val request = call.receive<CreateTaskRequestDto>()
                 val response = taskService.create(principal.userId, request)
                 call.respond(HttpStatusCode.Created, response)
             }
 
             get {
-                val principal = call.principal<AuthPrincipal>() ?: error("Usuário autenticado não disponível")
+                val principal = call.requireAuthPrincipal()
                 val response = taskService.listByOwner(
                     ownerId = principal.userId,
                     status = call.request.queryParameters["status"],
@@ -39,7 +40,7 @@ fun Route.taskRoutes(taskService: TaskService) {
             }
 
             patch("/{id}") {
-                val principal = call.principal<AuthPrincipal>() ?: error("Usuário autenticado não disponível")
+                val principal = call.requireAuthPrincipal()
                 val taskId = call.parameters["id"]?.let {
                     runCatching { UUID.fromString(it) }.getOrNull()
                 } ?: throw IllegalArgumentException("ID da tarefa inválido")
@@ -50,7 +51,7 @@ fun Route.taskRoutes(taskService: TaskService) {
             }
 
             delete("/{id}") {
-                val principal = call.principal<AuthPrincipal>() ?: error("Usuário autenticado não disponível")
+                val principal = call.requireAuthPrincipal()
                 val taskId = call.parameters["id"]?.let {
                     runCatching { UUID.fromString(it) }.getOrNull()
                 } ?: throw IllegalArgumentException("ID da tarefa inválido")
@@ -60,5 +61,13 @@ fun Route.taskRoutes(taskService: TaskService) {
             }
         }
     }
+}
+
+private fun io.ktor.server.application.ApplicationCall.requireAuthPrincipal(): AuthPrincipal {
+    return principal<AuthPrincipal>() ?: throw ApiException(
+        status = HttpStatusCode.Unauthorized,
+        error = "nao_autenticado",
+        message = "Usuário não autenticado",
+    )
 }
 

@@ -28,7 +28,15 @@ class TaskService(
         val now = Instant.now()
         val status = request.status ?: TaskStatus.PENDENTE
         val prioridade = request.prioridade ?: TaskPriority.MEDIA
-        val dataVencimento = request.dataVencimento?.let(Instant::parse)
+        val dataVencimento = request.dataVencimento?.let {
+            runCatching { Instant.parse(it) }.getOrElse {
+                throw ApiException(
+                    status = HttpStatusCode.BadRequest,
+                    error = "validacao",
+                    message = "data_vencimento inválida",
+                )
+            }
+        }
         val dataConclusao = if (status == TaskStatus.CONCLUIDA) now else null
 
         return taskRepository.create(
