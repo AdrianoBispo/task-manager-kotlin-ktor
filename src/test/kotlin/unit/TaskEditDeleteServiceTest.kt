@@ -5,6 +5,8 @@ import com.adrianobispo.shared.TaskPriority
 import com.adrianobispo.shared.TaskStatus
 import com.adrianobispo.tasks.TaskRecord
 import com.adrianobispo.tasks.TaskRepository
+import com.adrianobispo.tasks.TaskListQuery
+import com.adrianobispo.tasks.TaskListResult
 import com.adrianobispo.tasks.TaskService
 import com.adrianobispo.tasks.UpdateTaskRequestDto
 import io.ktor.http.HttpStatusCode
@@ -119,6 +121,11 @@ private class EditDeleteFakeTaskRepository(vararg tasks: TaskRecord) : TaskRepos
     )
 
     override fun listByOwner(ownerId: UUID): List<TaskRecord> = records.values.filter { it.idUsuario == ownerId }
+
+    override fun listByOwner(ownerId: UUID, query: TaskListQuery): TaskListResult {
+        val all = listByOwner(ownerId)
+        return TaskListResult(items = all, totalItems = all.size)
+    }
 
     override fun findById(taskId: UUID): TaskRecord? = records[taskId]
 

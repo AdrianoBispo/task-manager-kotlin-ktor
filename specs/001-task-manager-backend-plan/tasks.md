@@ -149,15 +149,15 @@ description: "Task list for Backend Kotlin/Ktor para Gerenciador de Tarefas"
 
 ### Testes da História de Usuário 5
 
-- [ ] T035 [P] [US5] Definir testes de contrato para busca, filtragem, ordenação e paginação em `src/test/kotlin/contract/TaskQueryContractTest.kt`
-- [ ] T036 [P] [US5] Adicionar testes unitários para normalização de consulta, ordenação e cálculo de metadados de paginação em `src/test/kotlin/unit/TaskQuerySpecTest.kt`
+- [X] T035 [P] [US5] Definir testes de contrato para busca, filtragem, ordenação e paginação em `src/test/kotlin/contract/TaskQueryContractTest.kt`
+- [X] T036 [P] [US5] Adicionar testes unitários para normalização de consulta, ordenação e cálculo de metadados de paginação em `src/test/kotlin/unit/TaskQuerySpecTest.kt`
 
 ### Implementação da História de Usuário 5
 
-- [ ] T037 [US5] Estender o construtor de consulta de listagem do repositório de tarefas com filtros, busca textual, ordenação e paginação em `src/main/kotlin/tasks/TaskRepository.kt`
-- [ ] T038 [US5] Implementar normalização da consulta de listagem e montagem dos metadados de resposta em `src/main/kotlin/tasks/TaskService.kt`
-- [ ] T039 [US5] Atualizar `GET /api/tasks` para interpretar parâmetros de query e retornar `TaskListResponse` em `src/main/kotlin/tasks/TaskRoutes.kt`
-- [ ] T040 [US5] Adicionar um teste de integração para comportamento combinado de busca/filtro/ordenação/paginação em `src/test/kotlin/integration/TaskQueryIntegrationTest.kt`
+- [X] T037 [US5] Estender o construtor de consulta de listagem do repositório de tarefas com filtros, busca textual, ordenação e paginação em `src/main/kotlin/tasks/TaskRepository.kt`
+- [X] T038 [US5] Implementar normalização da consulta de listagem e montagem dos metadados de resposta em `src/main/kotlin/tasks/TaskService.kt`
+- [X] T039 [US5] Atualizar `GET /api/tasks` para interpretar parâmetros de query e retornar `TaskListResponse` em `src/main/kotlin/tasks/TaskRoutes.kt`
+- [X] T040 [US5] Adicionar um teste de integração para comportamento combinado de busca/filtro/ordenação/paginação em `src/test/kotlin/integration/TaskQueryIntegrationTest.kt`
 
 **Checkpoint**: O endpoint de listagem deve corresponder totalmente ao contrato OpenAPI
 

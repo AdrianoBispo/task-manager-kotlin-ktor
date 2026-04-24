@@ -1,0 +1,22 @@
+# Build artifacts
+.gradle/
+build/
+out/
+
+# Dependencies and logs
+node_modules/
+*.log*
+coverage/
+
+# Environment and VCS
+.env*
+.git/
+
+# Docker files
+Dockerfile*
+.dockerignore
+
+# IDE
+.idea/
+.vscode/
+

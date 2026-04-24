@@ -10,6 +10,11 @@ import java.util.UUID
 class TaskService(
     private val taskRepository: TaskRepository,
 ) {
+    companion object {
+        private const val DEFAULT_PAGE = 1
+        private const val DEFAULT_LIMIT = 10
+    }
+
     fun create(ownerId: UUID, request: CreateTaskRequestDto): TaskDto {
         val titulo = request.titulo.trim()
         if (titulo.length !in 3..100) {
@@ -40,16 +45,37 @@ class TaskService(
     }
 
     fun listByOwner(ownerId: UUID): TaskListResponseDto {
-        val tasks = taskRepository.listByOwner(ownerId).map { it.toDto() }
-        val totalItens = tasks.size
+        return listByOwner(
+            ownerId = ownerId,
+            status = null,
+            prioridade = null,
+            q = null,
+            sort = null,
+            page = null,
+            limit = null,
+        )
+    }
+
+    fun listByOwner(
+        ownerId: UUID,
+        status: String?,
+        prioridade: String?,
+        q: String?,
+        sort: String?,
+        page: String?,
+        limit: String?,
+    ): TaskListResponseDto {
+        val normalizedQuery = normalizeQuery(status, prioridade, q, sort, page, limit)
+        val result = taskRepository.listByOwner(ownerId, normalizedQuery)
+        val totalPaginas = if (result.totalItems == 0) 0 else (result.totalItems + normalizedQuery.limit - 1) / normalizedQuery.limit
 
         return TaskListResponseDto(
-            dados = tasks,
+            dados = result.items.map { it.toDto() },
             meta = TaskListMetaDto(
-                totalItens = totalItens,
-                totalPaginas = if (totalItens == 0) 0 else 1,
-                paginaAtual = 1,
-                itensPorPagina = if (totalItens == 0) 10 else totalItens,
+                totalItens = result.totalItems,
+                totalPaginas = totalPaginas,
+                paginaAtual = normalizedQuery.page,
+                itensPorPagina = normalizedQuery.limit,
             ),
         )
     }
@@ -171,6 +197,55 @@ class TaskService(
         TaskStatus.PENDENTE -> to == TaskStatus.EM_ANDAMENTO || to == TaskStatus.CONCLUIDA
         TaskStatus.EM_ANDAMENTO -> to == TaskStatus.PENDENTE || to == TaskStatus.CONCLUIDA
         TaskStatus.CONCLUIDA -> to == TaskStatus.EM_ANDAMENTO
+    }
+
+    private fun normalizeQuery(
+        status: String?,
+        prioridade: String?,
+        q: String?,
+        sort: String?,
+        page: String?,
+        limit: String?,
+    ): TaskListQuery {
+        val normalizedStatus = status?.trim()?.takeIf { it.isNotEmpty() }?.let {
+            runCatching { TaskStatus.valueOf(it.uppercase()) }.getOrElse {
+                throw ApiException(HttpStatusCode.BadRequest, "validacao", "status inválido")
+            }
+        }
+
+        val normalizedPriority = prioridade?.trim()?.takeIf { it.isNotEmpty() }?.let {
+            runCatching { TaskPriority.valueOf(it.uppercase()) }.getOrElse {
+                throw ApiException(HttpStatusCode.BadRequest, "validacao", "prioridade inválida")
+            }
+        }
+
+        val normalizedSort = when (sort?.trim()?.takeIf { it.isNotEmpty() } ?: "-data_criacao") {
+            "data_vencimento" -> TaskSort(TaskSortField.DATA_VENCIMENTO, TaskSortDirection.ASC)
+            "-data_vencimento" -> TaskSort(TaskSortField.DATA_VENCIMENTO, TaskSortDirection.DESC)
+            "data_criacao" -> TaskSort(TaskSortField.DATA_CRIACAO, TaskSortDirection.ASC)
+            "-data_criacao" -> TaskSort(TaskSortField.DATA_CRIACAO, TaskSortDirection.DESC)
+            else -> throw ApiException(HttpStatusCode.BadRequest, "validacao", "sort inválido")
+        }
+
+        val normalizedPage = page?.toIntOrNull() ?: DEFAULT_PAGE
+        val normalizedLimit = limit?.toIntOrNull() ?: DEFAULT_LIMIT
+
+        if (normalizedPage < 1) {
+            throw ApiException(HttpStatusCode.BadRequest, "validacao", "page deve ser maior ou igual a 1")
+        }
+
+        if (normalizedLimit < 1) {
+            throw ApiException(HttpStatusCode.BadRequest, "validacao", "limit deve ser maior ou igual a 1")
+        }
+
+        return TaskListQuery(
+            status = normalizedStatus,
+            prioridade = normalizedPriority,
+            q = q?.trim()?.ifBlank { null },
+            sort = normalizedSort,
+            page = normalizedPage,
+            limit = normalizedLimit,
+        )
     }
 
     private fun TaskRecord.toDto(): TaskDto = TaskDto(

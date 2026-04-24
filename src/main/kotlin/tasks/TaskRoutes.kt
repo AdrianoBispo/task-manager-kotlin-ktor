@@ -26,7 +26,15 @@ fun Route.taskRoutes(taskService: TaskService) {
 
             get {
                 val principal = call.principal<AuthPrincipal>() ?: error("Usuário autenticado não disponível")
-                val response = taskService.listByOwner(principal.userId)
+                val response = taskService.listByOwner(
+                    ownerId = principal.userId,
+                    status = call.request.queryParameters["status"],
+                    prioridade = call.request.queryParameters["prioridade"],
+                    q = call.request.queryParameters["q"],
+                    sort = call.request.queryParameters["sort"],
+                    page = call.request.queryParameters["page"],
+                    limit = call.request.queryParameters["limit"],
+                )
                 call.respond(HttpStatusCode.OK, response)
             }
 
