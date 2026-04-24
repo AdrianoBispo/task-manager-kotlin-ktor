@@ -25,7 +25,7 @@ enum class TaskPriority {
 /**
  * Exposed table mapping for system users.
  */
-object UsersTable : UUIDTable("usuarios") {
+object UsersTable : UUIDTable("users") {
     val nome = varchar("nome", 120)
     val email = varchar("email", 255).uniqueIndex()
     val senhaHash = varchar("senha_hash", 255)
@@ -36,7 +36,7 @@ object UsersTable : UUIDTable("usuarios") {
 /**
  * Exposed table mapping for user tasks.
  */
-object TasksTable : UUIDTable("tarefas") {
+object TasksTable : UUIDTable("tasks") {
     val idUsuario = reference("id_usuario", UsersTable, onDelete = ReferenceOption.CASCADE)
     val titulo = varchar("titulo", 100)
     val descricao = text("descricao").nullable()

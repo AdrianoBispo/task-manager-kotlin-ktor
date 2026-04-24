@@ -11,7 +11,7 @@ Este diretório contém migrações SQL versionadas do backend.
 ## Estado atual
 
 - `V1__create_task_manager_schema.sql`
-  - cria tabelas `usuarios` e `tarefas`
+  - cria tabelas `users` e `tasks`
   - cria constraints de domínio (`status`, `prioridade`, `data_conclusao`)
   - cria índices básicos para consultas por usuário/status/prioridade
 
