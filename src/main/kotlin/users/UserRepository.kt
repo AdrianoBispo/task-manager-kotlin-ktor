@@ -22,14 +22,15 @@ data class UserRecord(
 interface UserRepository {
     fun findByEmail(email: String): UserRecord?
     fun create(nome: String, email: String, senhaHash: String, now: Instant = Instant.now()): UserRecord
-    fun updateLastLogin(userId: UUID, now: Instant = Instant.now())
+    fun updateLastLogin(email: String, now: Instant = Instant.now())
 }
 
 class ExposedUserRepository : UserRepository {
     override fun findByEmail(email: String): UserRecord? = transaction {
+        val normalizedEmail = email.trim().lowercase()
         UsersTable
             .selectAll()
-            .where { UsersTable.email eq email.trim().lowercase() }
+            .where { UsersTable.email eq normalizedEmail }
             .singleOrNull()
             ?.toUserRecord()
     }
@@ -59,9 +60,10 @@ class ExposedUserRepository : UserRepository {
         )
     }
 
-    override fun updateLastLogin(userId: UUID, now: Instant) {
+    override fun updateLastLogin(email: String, now: Instant) {
+        val normalizedEmail = email.trim().lowercase()
         transaction {
-            UsersTable.update({ UsersTable.id eq userId }) {
+            UsersTable.update({ UsersTable.email eq normalizedEmail }) {
                 it[ultimoLogin] = now
             }
         }

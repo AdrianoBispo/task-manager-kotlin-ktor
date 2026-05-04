@@ -49,7 +49,7 @@ class AuthService(
             throwInvalidCredentials()
         }
 
-        userRepository.updateLastLogin(user.id, Instant.now())
+        userRepository.updateLastLogin(normalizedEmail, Instant.now())
 
         return buildAuthResponse(user)
     }

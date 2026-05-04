@@ -41,22 +41,24 @@ Variaveis de ambiente suportadas:
 
 - `PORT` (default `8080`)
 - `POSTGRES_URL` (default `jdbc:postgresql://localhost:5432/task_manager`)
-- `POSTGRES_USER` (default `task_manager`)
-- `POSTGRES_PASSWORD` (default `task_manager`)
+- `POSTGRES_USER` (default `postgres`)
+- `POSTGRES_PASSWORD` (default `postgres`)
 - `JWT_SECRET` (default `task-manager-dev-secret`)
-- `JWT_ISSUER` (default `task-manager`)
-- `JWT_AUDIENCE` (default `task-manager-users`)
-- `JWT_REALM` (default `task-manager`)
-- `CORS_ALLOWED_HOSTS` (default `localhost:3000,127.0.0.1:3000,localhost:5173,127.0.0.1:5173`)
-- `CORS_ALLOW_CREDENTIALS` (default `false`)
+- `JWT_ISSUER` (default `task-manager-issuer`)
+- `JWT_AUDIENCE` (default `task-manager-audience`)
+- `JWT_REALM` (default `task-manager-realm`)
+- `CORS_ALLOWED_HOSTS` (default `localhost:3000,127.0.0.1:3000,localhost:5173,127.0.0.1:5173,localhost:4200,127.0.0.1:4200`)
+- `CORS_ALLOW_CREDENTIALS` (default `true`)
+
+Se nenhuma variavel de ambiente for exportada, o backend ainda inicia com os defaults acima.
 
 ### PostgreSQL local rapido (opcional)
 
 ```bash
 docker run --name task-manager-postgres \
   -e POSTGRES_DB=task_manager \
-  -e POSTGRES_USER=task_manager \
-  -e POSTGRES_PASSWORD=task_manager \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
   -p 5432:5432 \
   -d postgres:16
 ```
@@ -212,8 +214,8 @@ Codigos comuns observados:
 - Migracoes em `src/main/resources/db/migration`
 - Versao atual: `V1__create_task_manager_schema.sql`
 - Tabelas:
-  - `usuarios`
-  - `tarefas`
+  - `users`
+  - `tasks`
 
 No runtime com PostgreSQL, Flyway executa `migrate()` automaticamente ao inicializar.
 

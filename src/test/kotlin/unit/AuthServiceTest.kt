@@ -127,8 +127,8 @@ private class FakeUserRepository : UserRepository {
         return user
     }
 
-    override fun updateLastLogin(userId: UUID, now: Instant) {
-        val existing = usersByEmail.values.firstOrNull { it.id == userId } ?: return
+    override fun updateLastLogin(email: String, now: Instant) {
+        val existing = usersByEmail[email.trim().lowercase()] ?: return
         usersByEmail[existing.email] = existing.copy(ultimoLogin = now)
         lastLoginUpdatedAt = now
     }

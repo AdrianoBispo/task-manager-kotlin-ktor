@@ -68,7 +68,7 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(ktorLibs.server.testHost)
     testImplementation("io.mockk:mockk:1.13.16")
-    testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.5"))
+    testImplementation(platform("org.testcontainers:testcontainers-bom:1.21.0"))
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testRuntimeOnly(libs.h2database.h2)
@@ -80,3 +80,5 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
+

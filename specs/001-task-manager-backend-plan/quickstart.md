@@ -12,15 +12,15 @@
 
 ```bash
 export JWT_SECRET="task-manager-dev-secret"
-export JWT_ISSUER="task-manager"
-export JWT_AUDIENCE="task-manager-users"
-export JWT_REALM="task-manager"
+export JWT_ISSUER="task-manager-issuer"
+export JWT_AUDIENCE="task-manager-audience"
+export JWT_REALM="task-manager-realm"
 
 export POSTGRES_URL="jdbc:postgresql://localhost:5432/task_manager"
-export POSTGRES_USER="task_manager"
-export POSTGRES_PASSWORD="task_manager"
+export POSTGRES_USER="postgres"
+export POSTGRES_PASSWORD="postgres"
 
-export CORS_ALLOWED_HOSTS="localhost:3000,127.0.0.1:3000,localhost:5173,127.0.0.1:5173"
+export CORS_ALLOWED_HOSTS="localhost:3000,127.0.0.1:3000,localhost:5173,127.0.0.1:5173,localhost:4200,127.0.0.1:4200"
 ```
 
 2. Subir PostgreSQL local (exemplo rápido com Docker):
@@ -28,8 +28,8 @@ export CORS_ALLOWED_HOSTS="localhost:3000,127.0.0.1:3000,localhost:5173,127.0.0.
 ```bash
 docker run --name task-manager-postgres \
   -e POSTGRES_DB=task_manager \
-  -e POSTGRES_USER=task_manager \
-  -e POSTGRES_PASSWORD=task_manager \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
   -p 5432:5432 \
   -d postgres:16
 ```
@@ -44,7 +44,7 @@ docker run --name task-manager-postgres \
 
 Servidor esperado em `http://localhost:8080`.
 
-No startup, o Flyway deve aplicar migrações e criar tabelas `usuarios` e `tarefas`.
+No startup, o Flyway deve aplicar migrações e criar tabelas `users` e `tasks`.
 
 ## 4. Fluxo mínimo de validação manual
 
